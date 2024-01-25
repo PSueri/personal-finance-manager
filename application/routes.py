@@ -35,13 +35,13 @@ def dashboard():
     income_vs_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
                     TransactionHistory.type).group_by(TransactionHistory.type).order_by(TransactionHistory.type).all()
 
-    dates = db.session.query(db.func.sum(TransactionHistory.amount),
+    month_amount = db.session.query(db.func.sum(TransactionHistory.amount),
                              db.func.extract('year',TransactionHistory.date),
                              db.func.extract('month',TransactionHistory.date)).group_by(
         db.func.extract('month',TransactionHistory.date),
         db.func.extract('year',TransactionHistory.date)).order_by(
-        db.func.extract('month',TransactionHistory.date),
-        db.func.extract('year',TransactionHistory.date)).all()
+        db.func.extract('month',TransactionHistory.date).desc(),
+        db.func.extract('year',TransactionHistory.date).desc()).all()
 
     income_expense=[]
     for total_amount, _ in income_vs_expenses:
@@ -49,7 +49,7 @@ def dashboard():
 
     over_time_expenditure = []
     dates_label = []
-    for amount, year, month in dates:
+    for amount, year, month in month_amount:
         tmp_label=str(year)+" "+calendar.month_abbr[month]
         dates_label.append(tmp_label)
         over_time_expenditure.append(amount)
