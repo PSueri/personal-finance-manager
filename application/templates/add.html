@@ -24,16 +24,17 @@
 
                         <div class="form-group">
                             {{ form.type.label(class = "form-control-label") }}
-                            {{ form.type(class = "form-control form-control-sm") }}
+                            {{ form.type(class = "form-control form-control-sm", id="transactionType") }}
                         </div>
 
                         <div class="form-group">
                             {{ form.first_category.label(class = "form-control-label") }}
-                            {{ form.first_category(class = "form-control form-control-sm") }}
+                            {{ form.first_category(class = "form-control form-control-sm", id="firstCategory") }}
                         </div>
+
                         <div class="form-group">
                             {{ form.second_category.label(class = "form-control-label") }}
-                            {{ form.second_category(class = "form-control form-control-sm") }}
+                            {{ form.second_category(class = "form-control form-control-sm", id="secondCategory") }}
                         </div>
                         <div class="form-group">
                             {{ form.date.label(class = "form-control-label") }}
@@ -48,4 +49,118 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Add an event listener to the type field
+        document.getElementById('transactionType').addEventListener('change', function () {
+            // Get the selected value of the type field
+            var selectedTypeValue = this.value;
+
+            // Your logic to determine the options for the first_category field based on the selected value of the type field
+            var firstCategoryOptions = getFirstCategoryOptions(selectedTypeValue);
+
+            // Update the options of the first_category field
+            var firstCategoryField = document.getElementById('firstCategory');
+            firstCategoryField.innerHTML = firstCategoryOptions;
+
+            // Trigger change event on first_category field to update the second_category field
+            var changeEvent = new Event('change');
+            firstCategoryField.dispatchEvent(changeEvent);
+        });
+
+        // Add an event listener to the first_category field
+        document.getElementById('firstCategory').addEventListener('change', function () {
+            // Get the selected value of the first_category field
+            var selectedFirstCategoryValue = this.value;
+
+            // Your logic to determine the options for the second_category field based on the selected value of the first_category field
+            var secondCategoryOptions = getSecondCategoryOptions(selectedFirstCategoryValue);
+
+            // Update the options of the second_category field
+            var secondCategoryField = document.getElementById('secondCategory');
+            secondCategoryField.innerHTML = secondCategoryOptions;
+        });
+
+        // Your function to determine the options for the first_category field based on the selected value of the type field
+        function getFirstCategoryOptions(selectedTypeValue) {
+            // Replace this with your own logic to determine the options for the first_category field
+            var options = '';
+
+            switch (selectedTypeValue) {
+                case 'Expense':
+                    options += '<option value="Home">Home</option>';
+                    options += '<option value="Cash">Cash</option>';
+                    options += '<option value="Bills">Bills</option>';
+                    options += '<option value="Food">Food</option>';
+                    options += '<option value="Taxes">Taxes</option>';
+                    options += '<option value="LoanOrSubscription">LoanOrSubscription</option>';
+                    options += '<option value="OtherExpense">OtherExpense</option>';
+                    break;
+                case 'Income':
+                    options += '<option value="Work">Work</option>';
+                    options += '<option value="OtherIncome">OtherIncome</option>';
+                    break;
+                // Add more cases as needed
+
+            }
+            return options;
+        }
+
+        // Your function to determine the options for the second_category field based on the selected value of the first_category field
+        function getSecondCategoryOptions(selectedFirstCategoryValue) {
+            // Replace this with your own logic to determine the options for the second_category field
+            var options = '';
+
+            switch (selectedFirstCategoryValue) {
+                case 'Work':
+                    options += '<option value="Salary">Salary</option>';
+                    options += '<option value="Bonus">Bonus</option>';
+                    options += '<option value="ThirteenthSalary">ThirteenthSalary</option>';
+                    break;
+                case 'OtherIncome':
+                    options += '<option value="Gift">Gift</option>';
+                    options += '<option value="OtherIncome">OtherIncome</option>';
+                    break;
+                case 'Home':
+                    options += '<option value="Rent">Rent</option>';
+                    options += '<option value="Grocery">Grocery</option>';
+                    break;
+                case 'Cash':
+                    options += '<option value="Cash">Cash</option>';
+                    break;
+                case 'Bills':
+                    options += '<option value="Light">Light</option>';
+                    options += '<option value="Fine">Fine</option>';
+                    options += '<option value="OtherBill">OtherBill</option>';
+                    break;
+                case 'Food':
+                    options += '<option value="Restourant">Restourant</option>';
+                    options += '<option value="TakeAway">TakeAway</option>';
+                    options += '<option value="Bar">Bar</option>';
+                    break;
+                case 'Taxes':
+                    options += '<option value="Bank">Bank</option>';
+                    options += '<option value="OtherTaxes">OtherTaxes</option>';
+                    break;
+                case 'Transportation':
+                    options += '<option value="CarRent">CarRent</option>';
+                    options += '<option value="PublicTransport">PublicTransport</option>';
+                    break;
+                case 'LoanOrSubscription':
+                    options += '<option value="Loan">Loan</option>';
+                    options += '<option value="Telephone">Telephone</option>';
+                    options += '<option value="CrunchyRoll">CrunchyRoll</option>';
+                    options += '<option value="FantasyFootball">FantasyFootball</option>';
+                    options += '<option value="PSPlus">PSPlus</option>';
+                    break;
+                case 'OtherExpense':
+                    options += '<option value="Cigarettes">Cigarettes</option>';
+                    options += '<option value="Present">Present</option>';
+                    options += '<option value="Other">Other</option>';
+                    break;
+
+            }
+            return options;
+        }
+    </script>
 {% endblock %}
