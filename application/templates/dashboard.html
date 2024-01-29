@@ -15,6 +15,16 @@
         <div class="card card-style mb-2">
             <div class="card-body">
                 <div class="chart-container" style="position: relative;">
+                    <canvas id="expenses_vs_category"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
                     <canvas id="overtime_expenditure"></canvas>
                 </div>
             </div>
@@ -23,7 +33,7 @@
 {% block javascript %}
 <script>
     let income_expenses = JSON.parse({{ income_vs_expenses | tojson }})
-     Chart.scaleService.updateScaleDefaults('linear', {
+    Chart.scaleService.updateScaleDefaults('linear', {
             ticks: {
                 min: 0
             }
@@ -65,25 +75,63 @@
             }
         });
 
+    let category_expenses_values = JSON.parse({{ cat_exp_amount | tojson}})
+    let category_expenses_labels = JSON.parse({{ cat_exp_label  | tojson}})
+    let expenses_vs_category_chart = new Chart(expenses_vs_category, {
+            type: 'bar',
+            data: {
+                labels: category_expenses_labels,
+                datasets: [{
+                    label: "Categories Of Expenses",
+                    data: category_expenses_values,
+            backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
+                '#B276B2', '#E16851', '#FB8267'],
+            borderWidth: 1,
+            hoverBorderColor: "black",
+            hoverBorderWidth: 2,
+            hoverBackgroundColor: 'rgba(154, 245, 140)',
+            pointHoverRadius: 5
+        }],
+            },
+        options: {
+                title: {
+                    display: true,
+                        text: "Expenses per Categories",
+                            fontSize: 20,
+            },
+                legend: {
+                    position: "right",
+                        labels: {
+                        fontColor: "gray"
+                    },
+                    display: true,
+            },
+
+                elements: {
+                    hitRadius: 3,
+            }
+            }
+        });
+
     over_time_expenditure = JSON.parse({{over_time_expenditure | tojson}})
-        labels = JSON.parse({{ dates_label  | tojson}})
+    labels = JSON.parse({{ dates_label  | tojson}})
 
-        new Chart(document.getElementById("overtime_expenditure"), {
-                type: "line",
-                data:
-                {
-                    labels: labels,
-                    datasets: [{
-                        label: "NetFlow",
+    new Chart(document.getElementById("overtime_expenditure"), {
+            type: "line",
+            data:
+            {
+                labels: labels,
+                datasets: [{
+                    label: "NetFlow",
 
-                        data: over_time_expenditure,
-                        fill: false,
-                        borderColor: "rgb(75, 192, 192)",
-                        lineTension: 0.1
-                    }]
-                },
-                options: {}
-            });
+                    data: over_time_expenditure,
+                    fill: false,
+                    borderColor: "rgb(75, 192, 192)",
+                    lineTension: 0.1
+                }]
+            },
+            options: {}
+        });
 </script>
 {% endblock %}
 

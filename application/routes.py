@@ -34,6 +34,10 @@ def show_transactions():
 def dashboard():
     income_vs_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
                     TransactionHistory.type).group_by(TransactionHistory.type).order_by(TransactionHistory.type).all()
+    category_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
+                                           TransactionHistory.first_category).filter_by(type='Expense').group_by(
+                                            TransactionHistory.first_category).order_by(
+                                            TransactionHistory.first_category).all()
 
     month_amount = db.session.query(db.func.sum(TransactionHistory.amount),
                              db.func.extract('year',TransactionHistory.date),
@@ -42,10 +46,16 @@ def dashboard():
         db.func.extract('year',TransactionHistory.date)).order_by(
         db.func.extract('month',TransactionHistory.date).desc(),
         db.func.extract('year',TransactionHistory.date).desc()).all()
-
+    print(month_amount)
     income_expense=[]
     for total_amount, _ in income_vs_expenses:
         income_expense.append(total_amount)
+
+    cat_exp_amount = []
+    cat_exp_label = []
+    for amounts, category in category_expenses:
+        cat_exp_label.append(category)
+        cat_exp_amount.append(amounts)
 
     over_time_expenditure = []
     dates_label = []
@@ -53,8 +63,12 @@ def dashboard():
         tmp_label=str(year)+" "+calendar.month_abbr[month]
         dates_label.append(tmp_label)
         over_time_expenditure.append(amount)
-    return render_template('dashboard.html', title='Dashboard', income_vs_expenses=json.dumps(income_expense),
-                           over_time_expenditure=json.dumps(over_time_expenditure), dates_label=json.dumps(dates_label))
+    return render_template('dashboard.html', title='Dashboard',
+                           income_vs_expenses=json.dumps(income_expense),
+                           cat_exp_amount=json.dumps(cat_exp_amount),
+                           cat_exp_label=json.dumps(cat_exp_label),
+                           over_time_expenditure=json.dumps(over_time_expenditure),
+                           dates_label=json.dumps(dates_label))
 @app.route("/delete/<int:entry_id>")
 def delete(entry_id):
     entry = TransactionHistory.query.get_or_404(int(entry_id))
