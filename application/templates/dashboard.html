@@ -25,7 +25,7 @@
         <div class="card card-style mb-2">
             <div class="card-body">
                 <div class="chart-container" style="position: relative;">
-                    <canvas id="overtime_expenditure"></canvas>
+                    <canvas id="netflow"></canvas>
                 </div>
             </div>
         </div>
@@ -33,11 +33,7 @@
 {% block javascript %}
 <script>
     let income_expenses = JSON.parse({{ income_vs_expenses | tojson }})
-    Chart.scaleService.updateScaleDefaults('linear', {
-            ticks: {
-                min: 0
-            }
-    });
+
     let income_vs_expense_chart = new Chart(income_vs_expense, {
             type: 'pie',
             data: {
@@ -75,6 +71,11 @@
             }
         });
 
+    Chart.scaleService.updateScaleDefaults('linear', {
+            ticks: {
+                min: 0
+            }
+    });
     let category_expenses_values = JSON.parse({{ cat_exp_amount | tojson}})
     let category_expenses_labels = JSON.parse({{ cat_exp_label  | tojson}})
     let expenses_vs_category_chart = new Chart(expenses_vs_category, {
@@ -94,6 +95,12 @@
         }],
             },
         options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: Math.min(category_expenses_values),
+                    }
+                },
                 title: {
                     display: true,
                         text: "Expenses per Categories",
@@ -113,24 +120,35 @@
             }
         });
 
-    over_time_expenditure = JSON.parse({{over_time_expenditure | tojson}})
-    labels = JSON.parse({{ dates_label  | tojson}})
 
-    new Chart(document.getElementById("overtime_expenditure"), {
+    Chart.scaleService.updateScaleDefaults('linear', {
+            ticks: {
+
+            }
+    });
+
+    netflow_month = JSON.parse({{netflow_month | tojson}})
+    labels = JSON.parse({{ dates_label  | tojson}})
+    new Chart(document.getElementById("netflow"), {
             type: "line",
-            data:
-            {
+            data: {
                 labels: labels,
                 datasets: [{
                     label: "NetFlow",
-
-                    data: over_time_expenditure,
+                    data: netflow_month,
                     fill: false,
-                    borderColor: "rgb(75, 192, 192)",
+                    borderColor: "rgb(121,234,134)",
                     lineTension: 0.1
                 }]
             },
-            options: {}
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: Math.min(netflow_month)
+                    }
+                }
+            }
         });
 </script>
 {% endblock %}

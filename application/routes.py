@@ -4,6 +4,7 @@ from application.forms import UserInputForm
 from application.models import TransactionHistory
 from flask_sqlalchemy import SQLAlchemy
 import json
+import pandas as pd
 import calendar
 
 @app.route("/")
@@ -34,6 +35,14 @@ def show_transactions():
 def dashboard():
     income_vs_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
                     TransactionHistory.type).group_by(TransactionHistory.type).order_by(TransactionHistory.type).all()
+    income_dates = db.session.query(db.func.sum(TransactionHistory.amount),
+                                          TransactionHistory.date).filter_by(type='Income').group_by(
+                                            TransactionHistory.date).order_by(
+                                                TransactionHistory.date.desc()).all()
+    expense_dates = db.session.query(db.func.sum(TransactionHistory.amount),
+                                          TransactionHistory.date).filter_by(type='Expense').group_by(
+                                            TransactionHistory.date).order_by(
+                                                TransactionHistory.date.desc()).all()
     category_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
                                            TransactionHistory.first_category).filter_by(type='Expense').group_by(
                                             TransactionHistory.first_category).order_by(
@@ -46,28 +55,51 @@ def dashboard():
         db.func.extract('year',TransactionHistory.date)).order_by(
         db.func.extract('month',TransactionHistory.date).desc(),
         db.func.extract('year',TransactionHistory.date).desc()).all()
-    print(month_amount)
+
+    # Income DataFrame
+    income=[]
+    yearmonth=[]
+    for amount, date in income_dates:
+        income.append(amount)
+        yearmonth.append(str(date.year)+" "+calendar.month_abbr[date.month])
+    dict={'income':income, 'yearmonth':yearmonth}
+    income_df=pd.DataFrame(data=dict)
+    income_gouped=income_df.groupby("yearmonth", as_index=False).sum()
+
+    # Expense DataFrame
+    expense=[]
+    yearmonth=[]
+    for amount, date in expense_dates:
+        expense.append(amount)
+        yearmonth.append(str(date.year)+" "+calendar.month_abbr[date.month])
+    dict={'expense':expense, 'yearmonth':yearmonth}
+    expense_df=pd.DataFrame(data=dict)
+    expense_gouped=expense_df.groupby("yearmonth", as_index=False).sum()
+
+    # join df
+    income_expense_dates_df=income_gouped.merge(expense_gouped, on='yearmonth', how='right').fillna(0)
+    income_expense_dates_df["netflow"]=income_expense_dates_df["income"]-income_expense_dates_df["expense"]
+    netflow=income_expense_dates_df[['netflow', 'yearmonth']].groupby("yearmonth", as_index=False).sum()
+    #netflow_month=netflow
+    netflow_month = netflow['netflow'].tolist()
+    dates_label = netflow['yearmonth'].tolist()
+
     income_expense=[]
     for total_amount, _ in income_vs_expenses:
         income_expense.append(total_amount)
 
     cat_exp_amount = []
     cat_exp_label = []
-    for amounts, category in category_expenses:
+    for amount, category in category_expenses:
         cat_exp_label.append(category)
-        cat_exp_amount.append(amounts)
+        cat_exp_amount.append(amount)
 
-    over_time_expenditure = []
-    dates_label = []
-    for amount, year, month in month_amount:
-        tmp_label=str(year)+" "+calendar.month_abbr[month]
-        dates_label.append(tmp_label)
-        over_time_expenditure.append(amount)
+
     return render_template('dashboard.html', title='Dashboard',
                            income_vs_expenses=json.dumps(income_expense),
                            cat_exp_amount=json.dumps(cat_exp_amount),
                            cat_exp_label=json.dumps(cat_exp_label),
-                           over_time_expenditure=json.dumps(over_time_expenditure),
+                           netflow_month=json.dumps(netflow_month),
                            dates_label=json.dumps(dates_label))
 @app.route("/delete/<int:entry_id>")
 def delete(entry_id):
