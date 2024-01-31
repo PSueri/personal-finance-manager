@@ -48,9 +48,9 @@ def dashboard():
                                             TransactionHistory.first_category).order_by(
                                             TransactionHistory.first_category).all()
     category_incomes = db.session.query(db.func.sum(TransactionHistory.amount),
-                                           TransactionHistory.first_category).filter_by(type='Income').group_by(
-                                            TransactionHistory.first_category).order_by(
-                                            TransactionHistory.first_category).all()
+                                           TransactionHistory.second_category).filter_by(type='Income').group_by(
+                                            TransactionHistory.second_category).order_by(
+                                            TransactionHistory.second_category).all()
 
     month_amount = db.session.query(db.func.sum(TransactionHistory.amount),
                              db.func.extract('year',TransactionHistory.date),
