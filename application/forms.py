@@ -4,11 +4,6 @@ from wtforms.validators import DataRequired
 from wtforms.fields import DateField
 from datetime import datetime
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, IntegerField, SubmitField
-from wtforms.validators import DataRequired
-from wtforms.fields import DateField
-from datetime import datetime
 
 class UserInputForm(FlaskForm):
     TYPES = [('Income', 'Income'), ('Expense', 'Expense')]
