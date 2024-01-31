@@ -56,7 +56,7 @@
             // Get the selected value of the type field
             var selectedTypeValue = this.value;
 
-            // Your logic to determine the options for the first_category field based on the selected value of the type field
+            // Logic to determine the options for the first_category field based on the selected value of the type field
             var firstCategoryOptions = getFirstCategoryOptions(selectedTypeValue);
 
             // Update the options of the first_category field
@@ -73,7 +73,7 @@
             // Get the selected value of the first_category field
             var selectedFirstCategoryValue = this.value;
 
-            // Your logic to determine the options for the second_category field based on the selected value of the first_category field
+            // Logic to determine the options for the second_category field based on the selected value of the first_category field
             var secondCategoryOptions = getSecondCategoryOptions(selectedFirstCategoryValue);
 
             // Update the options of the second_category field
@@ -81,9 +81,8 @@
             secondCategoryField.innerHTML = secondCategoryOptions;
         });
 
-        // Your function to determine the options for the first_category field based on the selected value of the type field
+        // Function to determine the options for the first_category field based on the selected value of the type field
         function getFirstCategoryOptions(selectedTypeValue) {
-            // Replace this with your own logic to determine the options for the first_category field
             var options = '';
 
             switch (selectedTypeValue) {
@@ -100,15 +99,12 @@
                     options += '<option value="Work">Work</option>';
                     options += '<option value="OtherIncome">OtherIncome</option>';
                     break;
-                // Add more cases as needed
-
             }
             return options;
         }
 
-        // Your function to determine the options for the second_category field based on the selected value of the first_category field
+        // Function to determine the options for the second_category field based on the selected value of the first_category field
         function getSecondCategoryOptions(selectedFirstCategoryValue) {
-            // Replace this with your own logic to determine the options for the second_category field
             var options = '';
 
             switch (selectedFirstCategoryValue) {
