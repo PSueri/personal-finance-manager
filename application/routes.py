@@ -33,8 +33,6 @@ def show_transactions():
 
 @app.route('/dashboard')
 def dashboard():
-    income_vs_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
-                    TransactionHistory.type).group_by(TransactionHistory.type).order_by(TransactionHistory.type).all()
     income_dates = db.session.query(db.func.sum(TransactionHistory.amount),
                                           TransactionHistory.date).filter_by(type='Income').group_by(
                                             TransactionHistory.date).order_by(
@@ -97,10 +95,6 @@ def dashboard():
     # expenses
     expense_month = income_expense_dates_df['expense'].tolist()
 
-    income_expense=[]
-    for total_amount, _ in income_vs_expenses:
-        income_expense.append(total_amount)
-
     cat_exp_amount = []
     cat_exp_label = []
     for amount, category in category_expenses:
@@ -115,7 +109,6 @@ def dashboard():
 
 
     return render_template('dashboard.html', title='Dashboard',
-                           income_vs_expenses=json.dumps(income_expense),
                            income_month=json.dumps(income_month),
                            expense_month=json.dumps(expense_month),
                            netflow_month=json.dumps(netflow_month),
