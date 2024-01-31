@@ -47,6 +47,10 @@ def dashboard():
                                            TransactionHistory.first_category).filter_by(type='Expense').group_by(
                                             TransactionHistory.first_category).order_by(
                                             TransactionHistory.first_category).all()
+    category_incomes = db.session.query(db.func.sum(TransactionHistory.amount),
+                                           TransactionHistory.first_category).filter_by(type='Income').group_by(
+                                            TransactionHistory.first_category).order_by(
+                                            TransactionHistory.first_category).all()
 
     month_amount = db.session.query(db.func.sum(TransactionHistory.amount),
                              db.func.extract('year',TransactionHistory.date),
@@ -79,10 +83,19 @@ def dashboard():
     # join df
     income_expense_dates_df=income_gouped.merge(expense_gouped, on='yearmonth', how='right').fillna(0)
     income_expense_dates_df["netflow"]=income_expense_dates_df["income"]-income_expense_dates_df["expense"]
-    netflow=income_expense_dates_df[['netflow', 'yearmonth']].groupby("yearmonth", as_index=False).sum()
-    #netflow_month=netflow
-    netflow_month = netflow['netflow'].tolist()
-    dates_label = netflow['yearmonth'].tolist()
+    income_expense_dates_df["month"]=pd.to_datetime(income_expense_dates_df["yearmonth"].str[-3:], format='%b').dt.month
+    income_expense_dates_df["year"]=pd.to_datetime(income_expense_dates_df["yearmonth"].str[:4], format='%Y').dt.year
+    income_expense_dates_df=income_expense_dates_df.sort_values(by=['year', 'month'], ascending=True)
+    print(income_expense_dates_df)
+    # netflow
+    netflow_month = income_expense_dates_df['netflow'].tolist()
+    # label
+    dates_label = income_expense_dates_df['yearmonth'].tolist()
+    # incomes
+    #print(incomes)
+    income_month = income_expense_dates_df['income'].tolist()
+    # expenses
+    expense_month = income_expense_dates_df['expense'].tolist()
 
     income_expense=[]
     for total_amount, _ in income_vs_expenses:
@@ -94,13 +107,23 @@ def dashboard():
         cat_exp_label.append(category)
         cat_exp_amount.append(amount)
 
+    cat_inc_amount = []
+    cat_inc_label = []
+    for amount, category in category_incomes:
+        cat_inc_label.append(category)
+        cat_inc_amount.append(amount)
+
 
     return render_template('dashboard.html', title='Dashboard',
                            income_vs_expenses=json.dumps(income_expense),
+                           income_month=json.dumps(income_month),
+                           expense_month=json.dumps(expense_month),
+                           netflow_month=json.dumps(netflow_month),
+                           dates_label=json.dumps(dates_label),
                            cat_exp_amount=json.dumps(cat_exp_amount),
                            cat_exp_label=json.dumps(cat_exp_label),
-                           netflow_month=json.dumps(netflow_month),
-                           dates_label=json.dumps(dates_label))
+                           cat_inc_amount=json.dumps(cat_inc_amount),
+                           cat_inc_label=json.dumps(cat_inc_label))
 @app.route("/delete/<int:entry_id>")
 def delete(entry_id):
     entry = TransactionHistory.query.get_or_404(int(entry_id))

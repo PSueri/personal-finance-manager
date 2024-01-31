@@ -1,11 +1,32 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
     <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card card-style mb-2">
             <div class="card-body">
                 <div class="chart-container" style="position: relative;">
                     <canvas id="income_vs_expense"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="netflow"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="expense_pie"></canvas>
                 </div>
             </div>
         </div>
@@ -25,57 +46,113 @@
         <div class="card card-style mb-2">
             <div class="card-body">
                 <div class="chart-container" style="position: relative;">
-                    <canvas id="netflow"></canvas>
+                    <canvas id="income_pie"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="incomes_vs_category"></canvas>
                 </div>
             </div>
         </div>
     </div>
 {% block javascript %}
 <script>
-    let income_expenses = JSON.parse({{ income_vs_expenses | tojson }})
-
-    let income_vs_expense_chart = new Chart(income_vs_expense, {
-            type: 'pie',
-            data: {
-            labels: ['expense', 'income'],
-                datasets: [{
-                    label: "Income Vs Expenses",
-                    data: income_expenses,
-                    backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
-                        '#B276B2', '#E16851', '#FB8267'],
-
-                    borderWidth: 1,
-                    hoverBorderColor: "black",
-                    hoverBorderWidth: 2,
-                    hoverBackgroundColor: 'rgba(154, 245, 140)',
-                    pointHoverRadius: 5
-                }],
-            },
-            options: {
-                    title: {
-                        display: true,
-                            text: "Income Vs Expenses",
-                                fontSize: 20,
-                    },
-                    legend: {
-                        position: "right",
-                            labels: {
-                            fontColor: "gray"
-                        },
-                        display: true,
-                    },
-
-                    elements: {
-                        hitRadius: 3,
-                    }
-            }
-        });
-
     Chart.scaleService.updateScaleDefaults('linear', {
             ticks: {
                 min: 0
             }
     });
+    income_month = JSON.parse({{income_month | tojson}})
+    expense_month = JSON.parse({{expense_month | tojson}})
+    labels = JSON.parse({{ dates_label  | tojson}})
+    let income_vs_expense_chart = new Chart(income_vs_expense, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                {
+                    label: "Incomes",
+                    data: income_month,
+            backgroundColor: ['#79EA86', '#79EA86', '#79EA86', '#79EA86'],
+            borderWidth: 1,
+            hoverBorderColor: "black",
+            hoverBorderWidth: 2,
+            hoverBackgroundColor: 'rgba(154, 245, 140)',
+            pointHoverRadius: 5
+                },
+                {
+                    label: "Expenses",
+                    data: expense_month,
+            backgroundColor: ['#FAA43A ', '#FAA43A', '#FAA43A', '#FAA43A'],
+            borderWidth: 1,
+            hoverBorderColor: "black",
+            hoverBorderWidth: 2,
+            hoverBackgroundColor: 'rgba(154, 245, 140)',
+            pointHoverRadius: 5
+                }],
+            },
+        options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0,
+                    }
+                },
+                title: {
+                    display: true,
+                        text: "Incomes vs Expenses",
+                            fontSize: 20,
+            },
+                legend: {
+                    position: "right",
+                        labels: {
+                        fontColor: "gray"
+                    },
+                    display: true,
+            },
+
+                elements: {
+                    hitRadius: 3,
+            }
+            }
+        });
+    Chart.scaleService.updateScaleDefaults('linear', {
+            ticks: {
+
+            }
+    });
+
+    netflow_month = JSON.parse({{netflow_month | tojson}})
+    new Chart(document.getElementById("netflow"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "NetFlow",
+                    data: netflow_month,
+                    fill: false,
+                    borderColor: "rgb(121,234,134)",
+                    lineTension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: Math.min(netflow_month)
+                    }
+                }
+            }
+        });
+
+
+
     let category_expenses_values = JSON.parse({{ cat_exp_amount | tojson}})
     let category_expenses_labels = JSON.parse({{ cat_exp_label  | tojson}})
     let expenses_vs_category_chart = new Chart(expenses_vs_category, {
@@ -119,37 +196,124 @@
             }
             }
         });
-
-
-    Chart.scaleService.updateScaleDefaults('linear', {
-            ticks: {
-
-            }
-    });
-
-    netflow_month = JSON.parse({{netflow_month | tojson}})
-    labels = JSON.parse({{ dates_label  | tojson}})
-    new Chart(document.getElementById("netflow"), {
-            type: "line",
+        let expense_pie_chart = new Chart(expense_pie, {
+            type: 'pie',
             data: {
-                labels: labels,
+            labels: category_expenses_labels,
                 datasets: [{
-                    label: "NetFlow",
-                    data: netflow_month,
-                    fill: false,
-                    borderColor: "rgb(121,234,134)",
-                    lineTension: 0.1
-                }]
+                    label: "Expenses",
+                    data: category_expenses_values,
+                    backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
+                        '#B276B2', '#E16851', '#FB8267'],
+
+                    borderWidth: 1,
+                    hoverBorderColor: "black",
+                    hoverBorderWidth: 2,
+                    hoverBackgroundColor: 'rgba(154, 245, 140)',
+                    pointHoverRadius: 5
+                }],
             },
             options: {
+                    title: {
+                        display: true,
+                            text: "Expenses per Categories",
+                                fontSize: 20,
+                    },
+                    legend: {
+                        position: "right",
+                            labels: {
+                            fontColor: "gray"
+                        },
+                        display: true,
+                    },
+
+                    elements: {
+                        hitRadius: 3,
+                    }
+            }
+        });
+
+    let category_incomes_values = JSON.parse({{ cat_inc_amount | tojson}})
+    let category_incomes_labels = JSON.parse({{ cat_inc_label  | tojson}})
+    let incomes_vs_category_chart = new Chart(incomes_vs_category, {
+            type: 'bar',
+            data: {
+                labels: category_incomes_labels,
+                datasets: [{
+                    label: "Categories Of Incomes",
+                    data: category_incomes_values,
+            backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
+                '#B276B2', '#E16851', '#FB8267'],
+            borderWidth: 1,
+            hoverBorderColor: "black",
+            hoverBorderWidth: 2,
+            hoverBackgroundColor: 'rgba(154, 245, 140)',
+            pointHoverRadius: 5
+        }],
+            },
+        options: {
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: Math.min(netflow_month)
+                        min: Math.min(category_incomes_values),
                     }
-                }
+                },
+                title: {
+                    display: true,
+                        text: "Incomes per Categories",
+                            fontSize: 20,
+            },
+                legend: {
+                    position: "right",
+                        labels: {
+                        fontColor: "gray"
+                    },
+                    display: true,
+            },
+
+                elements: {
+                    hitRadius: 3,
+            }
             }
         });
+        let incomee_pie_chart = new Chart(income_pie, {
+            type: 'pie',
+            data: {
+            labels: category_incomes_labels,
+                datasets: [{
+                    label: "Expenses",
+                    data: category_incomes_values,
+                    backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
+                        '#B276B2', '#E16851', '#FB8267'],
+
+                    borderWidth: 1,
+                    hoverBorderColor: "black",
+                    hoverBorderWidth: 2,
+                    hoverBackgroundColor: 'rgba(154, 245, 140)',
+                    pointHoverRadius: 5
+                }],
+            },
+            options: {
+                    title: {
+                        display: true,
+                            text: "Incomes per Categories",
+                                fontSize: 20,
+                    },
+                    legend: {
+                        position: "right",
+                            labels: {
+                            fontColor: "gray"
+                        },
+                        display: true,
+                    },
+
+                    elements: {
+                        hitRadius: 3,
+                    }
+            }
+        });
+
+
 </script>
 {% endblock %}
 
