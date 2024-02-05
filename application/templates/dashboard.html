@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-
     <div class="col-xs-10 col-sm-6 col-md-6">
         <div class="card card-style mb-2">
             <div class="card-body">
@@ -18,6 +17,33 @@
                 <div class="chart-container" style="position: relative;">
                     <canvas id="netflow"></canvas>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-12 col-sm-12 col-md-12 text-center">
+        <div class="card card-style mb-2 mx-auto" >
+            <div class="card-body">
+                <form action="" method="POST">
+                    {{ selectionform.csrf_token() }}
+                    <fieldset class="form-group">
+                        <h5>Current selected period: {{current_period}}</h5>
+                        <legend class="mb-4">Select a Period</legend>
+                        <div class="form-group" style="max-width: 400px; display: inline-block;">
+                            {{ selectionform.selected_year.label(class="form-control-label") }}
+                            {{ selectionform.selected_year(class="form-control form-control-sm") }}
+                        </div>
+                        <br>
+                        <div class="form-group" style="max-width: 400px; display: inline-block;">
+                            {{ selectionform.selected_month.label(class="form-control-label") }}
+                            {{ selectionform.selected_month(class="form-control form-control-sm") }}
+                        </div>
+                        <br><br>
+                        <div class="form-group border-bottom pb-3">
+                            {{ selectionform.submit(class="btn btn-outline-info") }}
+                        </div>
+                    </fieldset>
+                </form>
             </div>
         </div>
     </div>
@@ -153,6 +179,11 @@
 
 
 
+    Chart.scaleService.updateScaleDefaults('linear', {
+            ticks: {
+                min: 0
+            }
+    });
     let category_expenses_values = JSON.parse({{ cat_exp_amount | tojson}})
     let category_expenses_labels = JSON.parse({{ cat_exp_label  | tojson}})
     let expenses_vs_category_chart = new Chart(expenses_vs_category, {

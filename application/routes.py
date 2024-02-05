@@ -1,11 +1,12 @@
 from application import app, db
-from flask import render_template, flash, redirect, url_for, get_flashed_messages
-from application.forms import UserInputForm
+from flask import render_template, flash, redirect, url_for, get_flashed_messages, request
+from application.forms import UserInputForm, SelectYearMonthForm
 from application.models import TransactionHistory
 from flask_sqlalchemy import SQLAlchemy
 import json
 import pandas as pd
 import calendar
+from datetime import datetime
 
 @app.route("/")
 def index():
@@ -31,8 +32,25 @@ def show_transactions():
     entries=TransactionHistory.query.order_by(TransactionHistory.date.desc()).all()
     return render_template('show_transactions.html', title='Transactions', entries=entries)
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=["GET", "POST"])
 def dashboard():
+    selectionform = SelectYearMonthForm()
+    if selectionform.validate_on_submit():
+        # Assuming the year and month are passed as query parameters from the frontend
+        year = selectionform.selected_year.data
+        selmonth = selectionform.selected_month.data
+    else:
+        year=0
+        selmonth=0
+    # Set default values if not provided
+    if not int(year):
+        print('not year')
+        year = datetime.now().year
+    if not int(selmonth):
+        print('not month')
+        selmonth = datetime.now().month
+    print(selmonth)
+    current_period = str(year)+', '+calendar.month_name[int(selmonth)]
     income_dates = db.session.query(db.func.sum(TransactionHistory.amount),
                                           TransactionHistory.date).filter_by(type='Income').group_by(
                                             TransactionHistory.date).order_by(
@@ -42,11 +60,15 @@ def dashboard():
                                             TransactionHistory.date).order_by(
                                                 TransactionHistory.date.desc()).all()
     category_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
-                                           TransactionHistory.first_category).filter_by(type='Expense').group_by(
-                                            TransactionHistory.first_category).order_by(
-                                            TransactionHistory.first_category).all()
+                                           TransactionHistory.first_category).filter_by(type='Expense').filter(
+                                            db.func.extract('year',TransactionHistory.date) == year).filter(
+                                            db.func.extract('month',TransactionHistory.date) == selmonth).group_by(
+                                             TransactionHistory.first_category).order_by(
+                                             TransactionHistory.first_category).all()
     category_incomes = db.session.query(db.func.sum(TransactionHistory.amount),
-                                           TransactionHistory.second_category).filter_by(type='Income').group_by(
+                                           TransactionHistory.second_category).filter_by(type='Income').filter(
+                                            db.func.extract('year',TransactionHistory.date) == year).filter(
+                                            db.func.extract('month',TransactionHistory.date) == selmonth).group_by(
                                             TransactionHistory.second_category).order_by(
                                             TransactionHistory.second_category).all()
 
@@ -90,7 +112,6 @@ def dashboard():
     # label
     dates_label = income_expense_dates_df['yearmonth'].tolist()
     # incomes
-    #print(incomes)
     income_month = income_expense_dates_df['income'].tolist()
     # expenses
     expense_month = income_expense_dates_df['expense'].tolist()
@@ -107,7 +128,6 @@ def dashboard():
         cat_inc_label.append(category)
         cat_inc_amount.append(amount)
 
-
     return render_template('dashboard.html', title='Dashboard',
                            income_month=json.dumps(income_month),
                            expense_month=json.dumps(expense_month),
@@ -116,7 +136,9 @@ def dashboard():
                            cat_exp_amount=json.dumps(cat_exp_amount),
                            cat_exp_label=json.dumps(cat_exp_label),
                            cat_inc_amount=json.dumps(cat_inc_amount),
-                           cat_inc_label=json.dumps(cat_inc_label))
+                           cat_inc_label=json.dumps(cat_inc_label),
+                           selectionform=selectionform,
+                           current_period=current_period)
 @app.route("/delete/<int:entry_id>")
 def delete(entry_id):
     entry = TransactionHistory.query.get_or_404(int(entry_id))

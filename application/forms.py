@@ -36,3 +36,17 @@ class UserInputForm(FlaskForm):
 
     amount = IntegerField('Amount', validators=[DataRequired()])
     submit = SubmitField("Add Transaction")
+
+class SelectYearMonthForm(FlaskForm):
+    year = datetime.today().year
+    YEARS = [
+        (year, str(year)), (year-1, str(year-1)), (year-2, str(year-2)), (year-3, str(year-3)), (year-4, str(year-4))
+    ]
+    MONTHS = [
+        (1, 'Jan'), (2, 'Feb'), (3, 'Mar'), (4, 'Apr'), (5, 'May'), (6, 'Jun'),
+        (7, 'Jul'), (8, 'Aug'), (9, 'Sep'), (10, 'Oct'), (11, 'Nov'), (12, 'Dec')
+    ]
+
+    selected_year = SelectField('Select a Year', validators=[DataRequired()], choices=[(0, ' ')] + YEARS)
+    selected_month = SelectField('Select a Month', validators=[DataRequired()], choices=[(0, ' ')] + MONTHS)
+    submit = SubmitField("Refresh Data")
