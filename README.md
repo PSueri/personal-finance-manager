@@ -22,7 +22,8 @@ The lower section titled "Incomes per Categories" shows two charts for income:
 
 ![d2](images/dashboard_2.jpg)
 
-The dashboard displays data for a user-selected month. By default, the current month is chosen, but users can switch to a different month using a selection tool 
+The dashboard displays data for a user-selected month. By default, the current month is chosen, but users can switch to a different month using a selection tool.
+
 ![d3](images/dashboard_3.jpg)
 
 ## Add Transaction Form
