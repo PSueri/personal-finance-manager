@@ -7,6 +7,7 @@ In the dashboard page it's present a dashboard that displays income and expense 
 It has several graphs: 
 - The bar graph titled "Incomes vs Expenses" shows the income and expense amounts over months. 
 - The line graph titled "NetFlow" shows the net flow of income and expenses over the same time period.
+
 ![d1](images/dashboard_1.jpg)
 
 The dashboard also displays income and expense data for a specific month. 
@@ -18,6 +19,7 @@ The upper section titled "Expenses per Categories" shows two charts for expenses
 The lower section titled "Incomes per Categories" shows two charts for income:
 - A pie chart that breaks down the total income into different categories (Salary, Gifts, etc.) for the selected month.
 - A bar chart that shows the amount received in each income category for the selected month.
+
 ![d2](images/dashboard_2.jpg)
 
 The dashboard displays data for a user-selected month. By default, the current month is chosen, but users can switch to a different month using a selection tool 
@@ -31,6 +33,7 @@ The form allows users to add new transactions to the financial dashboard. The da
 - Category: This section likely consists of two dropdown menus, allowing users to select a primary category and a secondary category for the transaction.
 - Date: This field allows users to enter the date of the transaction.
 - Add Transaction: Once users have filled out the form, they can click this button to submit the transaction and add it to the database.
+
 ![a1](images/add_expense.jpg)
 
 ## Transaction History Table
@@ -45,4 +48,5 @@ The table is ordered by date, with the most recent transactions at the top. Each
 - Second Category: A subcategory for the transaction.
 - Amount: The monetary value of the transaction.
 - Delete: A button that allows the user to delete the transaction from the table (and the underlying SQLite database).
+
 ![d3](images/transactions.jpg)
