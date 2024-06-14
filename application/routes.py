@@ -7,6 +7,7 @@ import json
 import pandas as pd
 import calendar
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 @app.route("/")
 def index():
@@ -51,6 +52,33 @@ def dashboard():
         selmonth = datetime.now().month
     print(selmonth)
     current_period = str(year)+', '+calendar.month_name[int(selmonth)]
+
+    def get_date_range_df(format_string="%Y %b"):
+        """
+        This function generates an ordered list of dates in the specified format
+        from one year ago to the current month.
+
+        Args:
+            format_string (str, optional): The format string for the dates. Defaults to "%Y %b".
+
+        Returns:
+            list: A list of strings representing dates in the specified format.
+        """
+        today = datetime.today()
+        one_year_ago = today - timedelta(days=365) + relativedelta(months=1)
+
+        # Ensure the start date is at the beginning of the month
+        one_year_ago = one_year_ago.replace(day=1)
+
+        dates = []
+        while one_year_ago <= today:
+            dates.append(one_year_ago.strftime(format_string))
+            one_year_ago = one_year_ago + relativedelta(months=1)
+            dates_df = pd.DataFrame(dates, columns=['yearmonth'])
+        return dates_df
+
+    one_year_dates = get_date_range_df()
+    print(one_year_dates)
     income_dates = db.session.query(db.func.sum(TransactionHistory.amount),
                                           TransactionHistory.date).filter_by(type='Income').group_by(
                                             TransactionHistory.date).order_by(
@@ -71,14 +99,6 @@ def dashboard():
                                             db.func.extract('month',TransactionHistory.date) == selmonth).group_by(
                                             TransactionHistory.second_category).order_by(
                                             TransactionHistory.second_category).all()
-
-    month_amount = db.session.query(db.func.sum(TransactionHistory.amount),
-                             db.func.extract('year',TransactionHistory.date),
-                             db.func.extract('month',TransactionHistory.date)).group_by(
-        db.func.extract('month',TransactionHistory.date),
-        db.func.extract('year',TransactionHistory.date)).order_by(
-        db.func.extract('month',TransactionHistory.date).desc(),
-        db.func.extract('year',TransactionHistory.date).desc()).all()
 
     # Income DataFrame
     income=[]
@@ -101,7 +121,8 @@ def dashboard():
     expense_gouped=expense_df.groupby("yearmonth", as_index=False).sum()
 
     # join df
-    income_expense_dates_df=income_gouped.merge(expense_gouped, on='yearmonth', how='right').fillna(0)
+    income_one_year = one_year_dates.merge(income_gouped, on='yearmonth', how='left').fillna(0)
+    income_expense_dates_df=income_one_year.merge(expense_gouped, on='yearmonth', how='left').fillna(0)
     income_expense_dates_df["netflow"]=income_expense_dates_df["income"]-income_expense_dates_df["expense"]
     income_expense_dates_df["month"]=pd.to_datetime(income_expense_dates_df["yearmonth"].str[-3:], format='%b').dt.month
     income_expense_dates_df["year"]=pd.to_datetime(income_expense_dates_df["yearmonth"].str[:4], format='%Y').dt.year
@@ -146,3 +167,9 @@ def delete(entry_id):
     db.session.commit()
     flash("Successful Deletion", 'success')
     return redirect(url_for('show_transactions'))
+
+
+@app.route("/crypto")
+def show_crypto_prices():
+    entries=TransactionHistory.query.order_by(TransactionHistory.date.desc()).all()
+    return render_template('cryptocurrencies.html', title='Cryptocurrencies', entries=entries)
