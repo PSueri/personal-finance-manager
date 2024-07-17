@@ -20,7 +20,64 @@ ID_Concorrente |Data_Rilevazione_Prezzo | Prezzo_Fisso | Prezzo_Variable
  
 Consegna: creare una tabella unica contenente le features + target label da dare in pasto ad un modello di churn detection (ad un anno).
  
- 
+ import pandas as pd
+
+# Load data from tables
+anagrafica_df = pd.read_csv('TABELLA_ANAGRAFICA.csv')
+consumi_df = pd.read_csv('TABELLA_CONSUMI.csv')
+contratti_df = pd.read_csv('TABELLA_CONTRATTI.csv')
+prezzo_energia_df = pd.read_csv('TABELLA_PREZZO_ENERGIA.csv')
+pagamenti_df = pd.read_csv('TABELLA_PAGAMENTI.csv')
+prezzi_concorrenti_df = pd.read_csv('TABELLA_PREZZI_CONCORRENTI.csv')
+
+# Merge tables based on common IDs
+merged_df = anagrafica_df.merge(
+    contratti_df[['ID_Cliente', 'ID_Contratto', 'Tipo_Contratto', 'Data_Sottoscrizione', 'Data_Rinnovo', 'Prezzo_Fisso', 'Prezzo_Variabile']],
+    on='ID_Cliente', how='left')
+
+merged_df = merged_df.merge(
+    consumi_df[['ID_Contratto', 'Data', 'Consumo_energia']],
+    on='ID_Contratto', how='left')
+
+merged_df = merged_df.merge(
+    prezzo_energia_df[['Data', 'Prezzo_energia']],
+    left_on='Data',
+    right_on='Data',
+    how='left')
+
+merged_df = merged_df.merge(
+    pagamenti_df[['ID_Cliente', 'Data_Emissione_Fattura', 'Data_Pagamento_Fattura', 'Prezzo_Fattura', 'Flag_Ritardo_Pagamento']],
+    on='ID_Cliente', how='left')
+
+merged_df = merged_df.merge(
+    prezzi_concorrenti_df[['ID_Concorrente', 'Data_Rilevazione_Prezzo', 'Prezzo_Fisso', 'Prezzo_Variable']],
+    left_on='Data_Rilevazione_Prezzo',
+    right_on='Data',
+    how='left')
+
+# Calculate churn target label
+churn_label = []
+for i in range(len(merged_df)):
+    row = merged_df.iloc[i]
+    if (row['Data_Rinnovo'] + pd.DateOffset(years=1)) < pd.to_datetime('today'):
+        churn_label.append(1)  # Churned
+    else:
+        churn_label.append(0)  # Not churned
+
+merged_df['Churn_Label'] = churn_label
+
+# Select features and target label
+features = ['Età', 'Coordinate_Zona_Geo', 'Tipo_Contratto', 'Data_Sottoscrizione', 'Prezzo_Fisso', 'Prezzo_Variabile',
+           'Consumo_energia', 'Prezzo_energia', 'Data_Emissione_Fattura', 'Data_Pagamento_Fattura', 'Prezzo_Fattura',
+           'Flag_Ritardo_Pagamento', 'Prezzo_Fisso_Concorrente', 'Prezzo_Variabile_Concorrente']
+target = 'Churn_Label'
+
+# Create single table for churn detection
+churn_detection_df = merged_df[['ID_Cliente'] + features + [target]]
+
+# Save the churn detection table
+churn_detection_df.to_csv('churn_detection_data.csv', index=False)
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 Esercizio 2:
  
