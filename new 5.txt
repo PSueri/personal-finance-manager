@@ -125,4 +125,64 @@ ID_Cliente | Data_Contatto | Ora_Contatto | Prob_Modello_OCT | Prob_Baseline
 Consegna: in questo caso la tabella contiene per ogni 'ID_Cliente' tuttel e possibili combinazioni di 'Data_Contatto' e 'Ora_Contatto', oltre alla proabilità di contatto secondo il modello di OCT (specifica per ogni cliente e per ogni slot di contatto). Implementare un algoritmo in grado di assegnare ad ogni 'ID_Cliente' un'unica coppia 'Data_Contatto' e 'Ora_Contatto', considerando I seguenti vincoli:
 •	In ogni slot orario (Data e Ora) possono essere assegnati un max di 100 clienti
 •	In ogni slot orario (Data e Ora) possono essere assegnati un min di 50 clienti
+import pandas as pd
+
+# Caricamento dei dati in un DataFrame
+df = pd.read_csv("TABELLA_MODELLO_OCT_ALL_COMBINATIONS.csv")
+
+# Ordinamento dei dati in base a Prob_Modello_OCT in ordine decrescente
+df_sorted = df.sort_values(by="Prob_Modello_OCT", ascending=False)
+
+# Definizione dei vincoli
+min_clienti_per_slot = 50
+max_clienti_per_slot = 100
+
+# Assegnazione degli appuntamenti
+appuntamenti = {}
+for index, row in df_sorted.iterrows():
+    cliente_id = row["ID_Cliente"]
+    data_contatto = row["Data_Contatto"]
+    ora_contatto = row["Ora_Contatto"]
+
+    # Identificazione dello slot di contatto corrente
+    slot_corrente = (data_contatto, ora_contatto)
+
+    # Verifica del numero di clienti nello slot corrente
+    if slot_corrente not in appuntamenti:
+        appuntamenti[slot_corrente] = 0
+    numero_clienti_slot_corrente = appuntamenti[slot_corrente]
+
+    # Assegnazione del cliente allo slot corrente se il numero di clienti è inferiore al minimo
+    if numero_clienti_slot_corrente < min_clienti_per_slot:
+        appuntamenti[slot_corrente] += 1
+        assegnazione_cliente = (cliente_id, data_contatto, ora_contatto)
+        print(f"Assegnazione: {assegnazione_cliente}")
+        continue
+
+    # Se lo slot corrente è pieno, controllo degli slot successivi
+    slot_successivi = df_sorted.loc[index:].loc[:, ["Data_Contatto", "Ora_Contatto"]]
+    for data_contatto_succ, ora_contatto_succ in slot_successivi.itertuples(index=False):
+        slot_successivo = (data_contatto_succ, ora_contatto_succ)
+
+        # Verifica del numero di clienti nello slot successivo
+        if slot_successivo not in appuntamenti:
+            appuntamenti[slot_successivo] = 0
+        numero_clienti_slot_successivo = appuntamenti[slot_successivo]
+
+        # Spostamento del cliente nello slot successivo se possibile
+        if numero_clienti_slot_successivo < max_clienti_per_slot:
+            appuntamenti[slot_corrente] -= 1
+            appuntamenti[slot_successivo] += 1
+            assegnazione_cliente = (cliente_id, data_contatto_succ, ora_contatto_succ)
+            print(f"Assegnazione: {assegnazione_cliente}")
+            break
+
+        # Se tutti gli slot successivi sono pieni, il cliente non può essere schedulato
+        if all(numero_clienti >= max_clienti_per_slot for numero_clienti in appuntamenti.values()):
+            print(f"Impossibile assegnare: {cliente_id}")
+            break
+
+# Controllo finale: verifica che tutti i clienti abbiano un'assegnazione
+if len(df_sorted) != len(appuntamenti):
+    print("Attenzione: non tutti i clienti hanno un'assegnazione")
 
