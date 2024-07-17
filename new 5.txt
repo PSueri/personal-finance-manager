@@ -90,7 +90,32 @@ ID_Cliente | Data_Ora_Contatto | Prob_Modello_OCT | Prob_Baseline
 Consegna: confrontare i risultati dei due modelli di assegnazione dello slot di contatto (Optimal Contact Time), dove 'Prob_Modello_OCT' è la proabilità di contatto secondo il modello, mentre 'Prob_Baseline' è la probabilità in assenza di modello (contatto random). Valutare se il modello in 'dev' è migliore di quello in 'prod'.
 La coppia 'ID_Cliente' e 'Data_Ora_Contatto' è univoca in ognuna delle due tabelle.
  
- 
+ import pandas as pd
+
+# Caricamento dati
+data_prod = pd.read_csv("TABELLA_MODELLO_OCT_PROD.csv")
+data_dev = pd.read_csv("TABELLA_MODELLO_OCT_DEV.csv")
+
+# Unione tabelle
+data = data_prod.merge(data_dev, on=["ID_Cliente", "Data_Ora_Contatto"], how="inner")
+
+# Calcolo differenza di probabilità
+data["Diff_Prob"] = data["Prob_Modello_OCT_DEV"] - data["Prob_Modello_OCT_PROD"]
+
+# Calcolo miglioramento medio
+miglioramento_medio = data["Diff_Prob"].mean()
+
+# Test statistico (esempio con test t per campioni appaiati)
+from scipy.stats import ttest_paired
+
+tstat, pval = ttest_paired(data["Prob_Modello_OCT_PROD"], data["Prob_Modello_OCT_DEV"])
+
+# Interpretazione risultati
+if pval < 0.05:
+    print(f"Il modello 'dev' migliora la probabilità di contatto rispetto al modello 'prod' con un miglioramento medio di {miglioramento_medio:.3f} (p-value = {pval:.5f}).")
+else:
+    print(f"Non vi è sufficiente evidenza per affermare che il modello 'dev' sia migliore del modello 'prod' (p-value = {pval:.5f}).")
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------
 Esercizio 3:
  
