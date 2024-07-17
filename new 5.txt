@@ -1,0 +1,46 @@
+Esercizio 1:
+ 
+TABELLA_ANAGRAFICA
+ID_Cliente | Età | Coordinate_Zona_Geo
+ 
+TABELLA_CONSUMI
+ID_Contratto | Data | Consumo_energia
+ 
+TABELLA_CONTRATTI
+ID_Cliente | ID_Contratto | Tipo_Contratto | Data_Sottoscrizione | Data_Rinnovo | Prezzo_Fisso | Prezzo_Variabile
+ 
+TABELLA_PREZZO_ENERGIA
+Data | Prezzo_energia
+ 
+TABELLA_PAGAMENTI
+ID_Cliente | Data_Emissione_Fattura | Data_Pagamento_Fattura | Prezzo_Fattura | Flag_Ritardo_Pagamento
+ 
+TABELLA_PREZZI_CONCORRENTI
+ID_Concorrente |Data_Rilevazione_Prezzo | Prezzo_Fisso | Prezzo_Variable
+ 
+Consegna: creare una tabella unica contenente le features + target label da dare in pasto ad un modello di churn detection (ad un anno).
+ 
+ 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Esercizio 2:
+ 
+TABELLA_MODELLO_OCT_PROD
+ID_Cliente | Data_Ora_Contatto | Prob_Modello_OCT | Prob_Baseline
+ 
+TABELLA_MODELLO_OCT_DEV
+ID_Cliente | Data_Ora_Contatto | Prob_Modello_OCT | Prob_Baseline
+ 
+Consegna: confrontare i risultati dei due modelli di assegnazione dello slot di contatto (Optimal Contact Time), dove 'Prob_Modello_OCT' è la proabilità di contatto secondo il modello, mentre 'Prob_Baseline' è la probabilità in assenza di modello (contatto random). Valutare se il modello in 'dev' è migliore di quello in 'prod'.
+La coppia 'ID_Cliente' e 'Data_Ora_Contatto' è univoca in ognuna delle due tabelle.
+ 
+ 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Esercizio 3:
+ 
+TABELLA_MODELLO_OCT_ALL_COMBINATIONS
+ID_Cliente | Data_Contatto | Ora_Contatto | Prob_Modello_OCT | Prob_Baseline
+ 
+Consegna: in questo caso la tabella contiene per ogni 'ID_Cliente' tuttel e possibili combinazioni di 'Data_Contatto' e 'Ora_Contatto', oltre alla proabilità di contatto secondo il modello di OCT (specifica per ogni cliente e per ogni slot di contatto). Implementare un algoritmo in grado di assegnare ad ogni 'ID_Cliente' un'unica coppia 'Data_Contatto' e 'Ora_Contatto', considerando I seguenti vincoli:
+•	In ogni slot orario (Data e Ora) possono essere assegnati un max di 100 clienti
+•	In ogni slot orario (Data e Ora) possono essere assegnati un min di 50 clienti
+
