@@ -69,10 +69,8 @@ def dashboard():
         selmonth = 0
     # Set default values if not provided
     if not int(year):
-        print('not year')
         year = datetime.now().year
     if not int(selmonth):
-        print('not month')
         selmonth = datetime.now().month
 
     current_period = str(year)+', '+calendar.month_name[int(selmonth)]
@@ -127,7 +125,7 @@ def dashboard():
     income_expense_dates_df["month"] = pd.to_datetime(income_expense_dates_df["yearmonth"], format='%Y %b').dt.month
     income_expense_dates_df["year"] = pd.to_datetime(income_expense_dates_df["yearmonth"], format='%Y %b').dt.year
     income_expense_dates_df=income_expense_dates_df.sort_values(by=['year', 'month'], ascending=True)
-    print(income_expense_dates_df)
+
     # netflow
     netflow_month = income_expense_dates_df['netflow'].tolist()
     # label
