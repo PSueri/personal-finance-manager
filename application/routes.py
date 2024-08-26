@@ -77,7 +77,6 @@ def dashboard():
     print(current_period)
 
     one_year_dates = get_date_range_df()
-    print(one_year_dates)
 
     income_dates = db.session.query(db.func.sum(TransactionHistory.amount),
                                           TransactionHistory.date).filter_by(type='Income').group_by(
@@ -93,10 +92,20 @@ def dashboard():
                                             db.func.extract('month',TransactionHistory.date) == selmonth).group_by(
                                              TransactionHistory.first_category).order_by(
                                              TransactionHistory.first_category).all()
+    category_expenses_year = db.session.query(db.func.sum(TransactionHistory.amount),
+                                           TransactionHistory.first_category).filter_by(type='Expense').filter(
+                                            db.func.extract('year',TransactionHistory.date) == year).group_by(
+                                             TransactionHistory.first_category).order_by(
+                                             TransactionHistory.first_category).all()
     category_incomes = db.session.query(db.func.sum(TransactionHistory.amount),
                                            TransactionHistory.second_category).filter_by(type='Income').filter(
                                             db.func.extract('year',TransactionHistory.date) == year).filter(
                                             db.func.extract('month',TransactionHistory.date) == selmonth).group_by(
+                                            TransactionHistory.second_category).order_by(
+                                            TransactionHistory.second_category).all()
+    category_incomes_year = db.session.query(db.func.sum(TransactionHistory.amount),
+                                           TransactionHistory.second_category).filter_by(type='Income').filter(
+                                            db.func.extract('year',TransactionHistory.date) == year).group_by(
                                             TransactionHistory.second_category).order_by(
                                             TransactionHistory.second_category).all()
 
@@ -135,12 +144,16 @@ def dashboard():
     # expenses
     expense_month = income_expense_dates_df['expense'].tolist()
 
-    # Create lists using list comprehension for monthly category amounts
+    # Create lists using list comprehension for monthly and yearly category amounts
     cat_exp_label = [category for _, category in category_expenses]
     cat_exp_amount = [amount for amount, _ in category_expenses]
+    cat_exp_label_year = [category for _, category in category_expenses_year]
+    cat_exp_amount_year = [amount for amount, _ in category_expenses_year]
 
     cat_inc_label = [category for _, category in category_incomes]
     cat_inc_amount = [amount for amount, _ in category_incomes]
+    cat_inc_label_year = [category for _, category in category_incomes_year]
+    cat_inc_amount_year = [amount for amount, _ in category_incomes_year]
 
     return render_template('dashboard.html', title='Dashboard',
                            income_month=json.dumps(income_month),
@@ -149,8 +162,12 @@ def dashboard():
                            dates_label=json.dumps(dates_label),
                            cat_exp_amount=json.dumps(cat_exp_amount),
                            cat_exp_label=json.dumps(cat_exp_label),
+                           cat_exp_amount_year=json.dumps(cat_exp_amount_year),
+                           cat_exp_label_year=json.dumps(cat_exp_label_year),
                            cat_inc_amount=json.dumps(cat_inc_amount),
                            cat_inc_label=json.dumps(cat_inc_label),
+                           cat_inc_amount_year=json.dumps(cat_inc_amount_year),
+                           cat_inc_label_year=json.dumps(cat_inc_label_year),
                            selectionform=selectionform,
                            current_period=current_period)
 @app.route("/delete/<int:entry_id>")

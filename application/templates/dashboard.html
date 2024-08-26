@@ -52,6 +52,26 @@
         <div class="card card-style mb-2">
             <div class="card-body">
                 <div class="chart-container" style="position: relative;">
+                    <canvas id="expense_year_pie"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="expenses_year_vs_category"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
                     <canvas id="expense_pie"></canvas>
                 </div>
             </div>
@@ -63,6 +83,26 @@
             <div class="card-body">
                 <div class="chart-container" style="position: relative;">
                     <canvas id="expenses_vs_category"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="income_year_pie"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-10 col-sm-6 col-md-6">
+        <div class="card card-style mb-2">
+            <div class="card-body">
+                <div class="chart-container" style="position: relative;">
+                    <canvas id="incomes_year_vs_category"></canvas>
                 </div>
             </div>
         </div>
@@ -186,6 +226,87 @@
     });
     let category_expenses_values = JSON.parse({{ cat_exp_amount | tojson}})
     let category_expenses_labels = JSON.parse({{ cat_exp_label  | tojson}})
+    let category_expenses_year_values = JSON.parse({{ cat_exp_amount_year | tojson}})
+    let category_expenses_year_labels = JSON.parse({{ cat_exp_label_year  | tojson}})
+
+    let expenses_year_vs_category_chart = new Chart(expenses_year_vs_category, {
+            type: 'bar',
+            data: {
+                labels: category_expenses_year_labels,
+                datasets: [{
+                    label: "Categories Of Expenses",
+                    data: category_expenses_year_values,
+            backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
+                        '#E16851','#FF66B2', '#FB8267', '#B276B2'],
+            borderWidth: 1,
+            hoverBorderColor: "black",
+            hoverBorderWidth: 2,
+            hoverBackgroundColor: 'rgba(135, 177, 215)',
+            pointHoverRadius: 5
+        }],
+            },
+        options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: Math.min(category_expenses_year_values),
+                    }
+                },
+                title: {
+                    display: true,
+                        text: "Expenses per Categories in selected year",
+                            fontSize: 20,
+            },
+                legend: {
+                    position: "right",
+                        labels: {
+                        fontColor: "gray"
+                    },
+                    display: true,
+            },
+
+                elements: {
+                    hitRadius: 3,
+            }
+            }
+        });
+        let expense_year_pie_chart = new Chart(expense_year_pie, {
+            type: 'pie',
+            data: {
+            labels: category_expenses_year_labels,
+                datasets: [{
+                    label: "Expenses",
+                    data: category_expenses_year_values,
+                    backgroundColor: ['#5DA5DA ', '#FAA43A', '#60BD68',
+                        '#E16851','#FF66B2', '#FB8267', '#B276B2'],
+
+                    borderWidth: 1,
+                    hoverBorderColor: "black",
+                    hoverBorderWidth: 2,
+                    hoverBackgroundColor: 'rgba(135, 177, 215)',
+                    pointHoverRadius: 5
+                }],
+            },
+            options: {
+                    title: {
+                        display: true,
+                            text: "Expenses per Categories in selected year",
+                                fontSize: 20,
+                    },
+                    legend: {
+                        position: "right",
+                            labels: {
+                            fontColor: "gray"
+                        },
+                        display: true,
+                    },
+
+                    elements: {
+                        hitRadius: 3,
+                    }
+            }
+        });
+
     let expenses_vs_category_chart = new Chart(expenses_vs_category, {
             type: 'bar',
             data: {
@@ -211,7 +332,7 @@
                 },
                 title: {
                     display: true,
-                        text: "Expenses per Categories",
+                        text: "Expenses per Categories in selected month",
                             fontSize: 20,
             },
                 legend: {
@@ -247,7 +368,7 @@
             options: {
                     title: {
                         display: true,
-                            text: "Expenses per Categories",
+                            text: "Expenses per Categories in selected month",
                                 fontSize: 20,
                     },
                     legend: {
@@ -266,6 +387,85 @@
 
     let category_incomes_values = JSON.parse({{ cat_inc_amount | tojson}})
     let category_incomes_labels = JSON.parse({{ cat_inc_label  | tojson}})
+    let category_incomes_year_values = JSON.parse({{ cat_inc_amount_year | tojson}})
+    let category_incomes_year_labels = JSON.parse({{ cat_inc_label_year  | tojson}})
+    let incomes_year_vs_category_chart = new Chart(incomes_year_vs_category, {
+            type: 'bar',
+            data: {
+                labels: category_incomes_year_labels,
+                datasets: [{
+                    label: "Categories Of Incomes",
+                    data: category_incomes_year_values,
+            backgroundColor: ['#5DA5DA ', '#FAA43A', '#E16851', '#60BD68',
+                        '#FF66B2', '#FB8267', '#B276B2'],
+            borderWidth: 1,
+            hoverBorderColor: "black",
+            hoverBorderWidth: 2,
+            hoverBackgroundColor: 'rgba(135, 177, 215)',
+            pointHoverRadius: 5
+        }],
+            },
+        options: {
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: Math.min(category_incomes_year_values),
+                    }
+                },
+                title: {
+                    display: true,
+                        text: "Incomes per Categories in selected year",
+                            fontSize: 20,
+            },
+                legend: {
+                    position: "right",
+                        labels: {
+                        fontColor: "gray"
+                    },
+                    display: true,
+            },
+
+                elements: {
+                    hitRadius: 3,
+            }
+            }
+        });
+        let income_year_pie_chart = new Chart(income_year_pie, {
+            type: 'pie',
+            data: {
+            labels: category_incomes_year_labels,
+                datasets: [{
+                    label: "Expenses",
+                    data: category_incomes_year_values,
+                    backgroundColor: ['#5DA5DA ', '#FAA43A', '#E16851', '#60BD68',
+                        '#FF66B2', '#FB8267', '#B276B2'],
+
+                    borderWidth: 1,
+                    hoverBorderColor: "black",
+                    hoverBorderWidth: 2,
+                    hoverBackgroundColor: 'rgba(135, 177, 215)',
+                    pointHoverRadius: 5
+                }],
+            },
+            options: {
+                    title: {
+                        display: true,
+                            text: "Incomes per Categories in the selected year",
+                                fontSize: 20,
+                    },
+                    legend: {
+                        position: "right",
+                            labels: {
+                            fontColor: "gray"
+                        },
+                        display: true,
+                    },
+
+                    elements: {
+                        hitRadius: 3,
+                    }
+            }
+        });
     let incomes_vs_category_chart = new Chart(incomes_vs_category, {
             type: 'bar',
             data: {
@@ -291,7 +491,7 @@
                 },
                 title: {
                     display: true,
-                        text: "Incomes per Categories",
+                        text: "Incomes per Categories in the selected month",
                             fontSize: 20,
             },
                 legend: {
@@ -307,7 +507,7 @@
             }
             }
         });
-        let incomee_pie_chart = new Chart(income_pie, {
+        let income_pie_chart = new Chart(income_pie, {
             type: 'pie',
             data: {
             labels: category_incomes_labels,
@@ -327,7 +527,7 @@
             options: {
                     title: {
                         display: true,
-                            text: "Incomes per Categories",
+                            text: "Incomes per Categories in the selected month",
                                 fontSize: 20,
                     },
                     legend: {
