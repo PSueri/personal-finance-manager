@@ -91,10 +91,10 @@
                     options += '<option value="Cash">Cash</option>';
                     options += '<option value="Bills">Bills</option>';
                     options += '<option value="Food">Food</option>';
-                    options += '<option value="Taxes">Taxes</option>';
                     options += '<option value="Transportation">Transportation</option>';
                     options += '<option value="Shopping">Shopping</option>';
                     options += '<option value="LoanOrSubscription">LoanOrSubscription</option>';
+                    options += '<option value="Holiday">Holiday</option>';
                     options += '<option value="OtherExpense">OtherExpense</option>';
                     break;
                 case 'Income':
@@ -137,10 +137,6 @@
                     options += '<option value="Bar">Bar</option>';
                     options += '<option value="Grocery">Grocery</option>';
                     break;
-                case 'Taxes':
-                    options += '<option value="Bank">Bank</option>';
-                    options += '<option value="OtherTaxes">OtherTaxes</option>';
-                    break;
                 case 'Transportation':
                     options += '<option value="CarRent">CarRent</option>';
                     options += '<option value="PublicTransport">PublicTransport</option>';
@@ -160,11 +156,14 @@
                     options += '<option value="DAZN">DAZN</option>';
                     options += '<option value="Chess.com">Chess.com</option>';
                     break;
+                case 'Holiday':
+                    options += '<option value="Generic">Generic</option>';
+                    break;
                 case 'OtherExpense':
                     options += '<option value="Cigarettes">Cigarettes</option>';
                     options += '<option value="Present">Present</option>';
-                    options += '<option value="Holiday">Holiday</option>';
                     options += '<option value="Partner">Partner</option>';
+                    options += '<option value="Taxes">Taxes</option>';
                     options += '<option value="Other">Other</option>';
                     break;
             }

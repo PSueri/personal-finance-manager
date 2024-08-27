@@ -12,7 +12,7 @@ class UserInputForm(FlaskForm):
         ('Work', 'Work'), ('OtherIncome', 'OtherIncome'), ('Home', 'Home'),
         ('Cash', 'Cash'), ('Bills', 'Bills'), ('Food', 'Food'),
         ('Taxes', 'Taxes'), ('Transportation', 'Transportation'), ('Shopping', 'Shopping'),
-        ('LoanOrSubscription', 'LoanOrSubscription'), ('OtherExpense', 'OtherExpense')
+        ('LoanOrSubscription', 'LoanOrSubscription'), ('Holiday', 'Holiday'), ('OtherExpense', 'OtherExpense')
     ]
 
     SECOND_CATEGORIES = [
@@ -25,8 +25,8 @@ class UserInputForm(FlaskForm):
         ('Clothes', 'Clothes'), ('Technology', 'Technology'), ('Books', 'Books'),  ('OtherShopping', 'OtherShopping'),
         ('Loan', 'Loan'), ('DAZN', 'DAZN'), ('PSPlus', 'PSPlus'), ('CrunchyRoll', 'CrunchyRoll'),
         ('FantasyFootball', 'FantasyFootball'), ('Chess.com', 'Chess.com'), ('Telephone', 'Telephone'),
-        ('Cigarettes', 'Cigarettes'), ('Present', 'Present'), ('Holiday', 'Holiday'), ('Partner', 'Partner'),
-        ('Other', 'Other')
+        ('Generic', 'Generic'), ('Cigarettes', 'Cigarettes'), ('Present', 'Present'), ('Partner', 'Partner'),
+        ('Taxes', 'Taxes'), ('Other', 'Other')
     ]
 
     type = SelectField('Type', validators=[DataRequired()], choices=[('Select', ' ')] + TYPES)
