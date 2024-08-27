@@ -11,7 +11,7 @@ class UserInputForm(FlaskForm):
     FIRST_CATEGORIES = [
         ('Work', 'Work'), ('OtherIncome', 'OtherIncome'), ('Home', 'Home'),
         ('Cash', 'Cash'), ('Bills', 'Bills'), ('Food', 'Food'),
-        ('Taxes', 'Taxes'), ('Transportation', 'Transportation'),
+        ('Taxes', 'Taxes'), ('Transportation', 'Transportation'), ('Shopping', 'Shopping'),
         ('LoanOrSubscription', 'LoanOrSubscription'), ('OtherExpense', 'OtherExpense')
     ]
 
@@ -21,9 +21,11 @@ class UserInputForm(FlaskForm):
         ('Grocery', 'Grocery'), ('Bancomat', 'Bancomat'), ('Light', 'Light'), ('Fine', 'Fine'),
         ('OtherBill', 'OtherBill'), ('Restourant', 'Restourant'), ('TakeAway', 'TakeAway'),
         ('Bar', 'Bar'), ('Bank', 'Bank'), ('OtherTaxes', 'OtherTaxes'),
-        ('CarRent', 'CarRent'), ('PublicTransport', 'PublicTransport'), ('Loan', 'Loan'), ('DAZN', 'DAZN'),
-        ('PSPlus', 'PSPlus'), ('CrunchyRoll', 'CrunchyRoll'), ('FantasyFootball', 'FantasyFootball'),
-        ('Telephone', 'Telephone'), ('Cigarettes', 'Cigarettes'), ('Present', 'Present'), ('Holiday', 'Holiday'),
+        ('CarRent', 'CarRent'), ('PublicTransport', 'PublicTransport'),
+        ('Clothes', 'Clothes'), ('Technology', 'Technology'), ('Books', 'Books'),  ('OtherShopping', 'OtherShopping'),
+        ('Loan', 'Loan'), ('DAZN', 'DAZN'), ('PSPlus', 'PSPlus'), ('CrunchyRoll', 'CrunchyRoll'),
+        ('FantasyFootball', 'FantasyFootball'), ('Chess.com', 'Chess.com'), ('Telephone', 'Telephone'),
+        ('Cigarettes', 'Cigarettes'), ('Present', 'Present'), ('Holiday', 'Holiday'), ('Partner', 'Partner'),
         ('Other', 'Other')
     ]
 

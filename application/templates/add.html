@@ -92,6 +92,8 @@
                     options += '<option value="Bills">Bills</option>';
                     options += '<option value="Food">Food</option>';
                     options += '<option value="Taxes">Taxes</option>';
+                    options += '<option value="Transportation">Transportation</option>';
+                    options += '<option value="Shopping">Shopping</option>';
                     options += '<option value="LoanOrSubscription">LoanOrSubscription</option>';
                     options += '<option value="OtherExpense">OtherExpense</option>';
                     break;
@@ -143,6 +145,12 @@
                     options += '<option value="CarRent">CarRent</option>';
                     options += '<option value="PublicTransport">PublicTransport</option>';
                     break;
+                case 'Shopping':
+                    options += '<option value="Clothes">Clothes</option>';
+                    options += '<option value="Technology">Technology</option>';
+                    options += '<option value="Books">Books</option>';
+                    options += '<option value="OtherShopping">OtherShopping</option>';
+                    break;
                 case 'LoanOrSubscription':
                     options += '<option value="Loan">Loan</option>';
                     options += '<option value="Telephone">Telephone</option>';
@@ -150,14 +158,15 @@
                     options += '<option value="FantasyFootball">FantasyFootball</option>';
                     options += '<option value="PSPlus">PSPlus</option>';
                     options += '<option value="DAZN">DAZN</option>';
+                    options += '<option value="Chess.com">Chess.com</option>';
                     break;
                 case 'OtherExpense':
                     options += '<option value="Cigarettes">Cigarettes</option>';
                     options += '<option value="Present">Present</option>';
                     options += '<option value="Holiday">Holiday</option>';
+                    options += '<option value="Partner">Partner</option>';
                     options += '<option value="Other">Other</option>';
                     break;
-
             }
             return options;
         }
