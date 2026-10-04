@@ -63,123 +63,58 @@
     </div>
 
     <script>
-        // Add an event listener to the type field
-        document.getElementById('transactionType').addEventListener('change', function () {
-            // Get the selected value of the type field
-            var selectedTypeValue = this.value;
+        const categoryTree = {{ category_tree | tojson }};
 
-            // Logic to determine the options for the first_category field based on the selected value of the type field
-            var firstCategoryOptions = getFirstCategoryOptions(selectedTypeValue);
+        const typeField = document.getElementById("transactionType");
+        const categoryField = document.getElementById("firstCategory");
+        const subcategoryField = document.getElementById("secondCategory");
 
-            // Update the options of the first_category field
-            var firstCategoryField = document.getElementById('firstCategory');
-            firstCategoryField.innerHTML = firstCategoryOptions;
+        function setOptions(field, values, selectedValue = "") {
+            field.replaceChildren(new Option("Select...", ""));
 
-            // Trigger change event on first_category field to update the second_category field
-            var changeEvent = new Event('change');
-            firstCategoryField.dispatchEvent(changeEvent);
-        });
-
-        // Add an event listener to the first_category field
-        document.getElementById('firstCategory').addEventListener('change', function () {
-            // Get the selected value of the first_category field
-            var selectedFirstCategoryValue = this.value;
-
-            // Logic to determine the options for the second_category field based on the selected value of the first_category field
-            var secondCategoryOptions = getSecondCategoryOptions(selectedFirstCategoryValue);
-
-            // Update the options of the second_category field
-            var secondCategoryField = document.getElementById('secondCategory');
-            secondCategoryField.innerHTML = secondCategoryOptions;
-        });
-
-        // Function to determine the options for the first_category field based on the selected value of the type field
-        function getFirstCategoryOptions(selectedTypeValue) {
-            var options = '';
-
-            switch (selectedTypeValue) {
-                case 'Expense':
-                    options += '<option value="Home">Home</option>';
-                    options += '<option value="Cash">Cash</option>';
-                    options += '<option value="Bills">Bills</option>';
-                    options += '<option value="Food">Food</option>';
-                    options += '<option value="Transportation">Transportation</option>';
-                    options += '<option value="Shopping">Shopping</option>';
-                    options += '<option value="LoanOrSubscription">LoanOrSubscription</option>';
-                    options += '<option value="Holiday">Holiday</option>';
-                    options += '<option value="OtherExpense">OtherExpense</option>';
-                    break;
-                case 'Income':
-                    options += '<option value="Work">Work</option>';
-                    options += '<option value="OtherIncome">OtherIncome</option>';
-                    break;
+            for (const value of values) {
+                field.add(new Option(value, value));
             }
-            return options;
+
+            field.value = values.includes(selectedValue)
+                ? selectedValue
+                : "";
         }
 
-        // Function to determine the options for the second_category field based on the selected value of the first_category field
-        function getSecondCategoryOptions(selectedFirstCategoryValue) {
-            var options = '';
+        function updateSubcategories(selectedValue = "") {
+            const categories = categoryTree[typeField.value] || {};
+            const subcategories = categories[categoryField.value] || [];
 
-            switch (selectedFirstCategoryValue) {
-                case 'Work':
-                    options += '<option value="Salary">Salary</option>';
-                    options += '<option value="Bonus">Bonus</option>';
-                    options += '<option value="ThirteenthSalary">ThirteenthSalary</option>';
-                    break;
-                case 'OtherIncome':
-                    options += '<option value="Gift">Gift</option>';
-                    options += '<option value="OtherIncome">OtherIncome</option>';
-                    break;
-                case 'Home':
-                    options += '<option value="Rent">Rent</option>';
-                    options += '<option value="Grocery">Grocery</option>';
-                    break;
-                case 'Cash':
-                    options += '<option value="Bancomat">Bancomat</option>';
-                    break;
-                case 'Bills':
-                    options += '<option value="Light">Light</option>';
-                    options += '<option value="Fine">Fine</option>';
-                    options += '<option value="OtherBill">OtherBill</option>';
-                    break;
-                case 'Food':
-                    options += '<option value="Restourant">Restourant</option>';
-                    options += '<option value="TakeAway">TakeAway</option>';
-                    options += '<option value="Bar">Bar</option>';
-                    options += '<option value="Grocery">Grocery</option>';
-                    break;
-                case 'Transportation':
-                    options += '<option value="CarRent">CarRent</option>';
-                    options += '<option value="PublicTransport">PublicTransport</option>';
-                    break;
-                case 'Shopping':
-                    options += '<option value="Clothes">Clothes</option>';
-                    options += '<option value="Technology">Technology</option>';
-                    options += '<option value="Books">Books</option>';
-                    options += '<option value="OtherShopping">OtherShopping</option>';
-                    break;
-                case 'LoanOrSubscription':
-                    options += '<option value="Loan">Loan</option>';
-                    options += '<option value="Telephone">Telephone</option>';
-                    options += '<option value="CrunchyRoll">CrunchyRoll</option>';
-                    options += '<option value="FantasyFootball">FantasyFootball</option>';
-                    options += '<option value="PSPlus">PSPlus</option>';
-                    options += '<option value="DAZN">DAZN</option>';
-                    options += '<option value="Chess.com">Chess.com</option>';
-                    break;
-                case 'Holiday':
-                    options += '<option value="Generic">Generic</option>';
-                    break;
-                case 'OtherExpense':
-                    options += '<option value="Cigarettes">Cigarettes</option>';
-                    options += '<option value="Present">Present</option>';
-                    options += '<option value="Partner">Partner</option>';
-                    options += '<option value="Taxes">Taxes</option>';
-                    options += '<option value="Other">Other</option>';
-                    break;
-            }
-            return options;
+            setOptions(subcategoryField, subcategories, selectedValue);
         }
+
+        function updateCategories(
+            selectedCategory = "",
+            selectedSubcategory = ""
+        ) {
+            const categories = categoryTree[typeField.value] || {};
+
+            setOptions(
+                categoryField,
+                Object.keys(categories),
+                selectedCategory
+            );
+
+            updateSubcategories(selectedSubcategory);
+        }
+
+        typeField.addEventListener("change", () => {
+            updateCategories();
+        });
+
+        categoryField.addEventListener("change", () => {
+            updateSubcategories();
+        });
+
+        // Mantiene le selezioni valide dopo un errore del form.
+        updateCategories(
+            categoryField.value,
+            subcategoryField.value
+        );
     </script>
 {% endblock %}

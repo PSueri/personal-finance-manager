@@ -1,55 +1,52 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, SubmitField
-from wtforms.validators import DataRequired, InputRequired, NumberRange
+from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
 from wtforms.fields import DateField
+
+from application.categories import CATEGORY_TREE
 from datetime import date, datetime
 
-
 class UserInputForm(FlaskForm):
-    TYPES = [('Income', 'Income'), ('Expense', 'Expense')]
+    TYPES = [(name, name) for name in CATEGORY_TREE]
 
-    FIRST_CATEGORIES = [
-        ('Work', 'Work'), ('OtherIncome', 'OtherIncome'), ('Home', 'Home'),
-        ('Cash', 'Cash'), ('Bills', 'Bills'), ('Food', 'Food'),
-        ('Taxes', 'Taxes'), ('Transportation', 'Transportation'), ('Shopping', 'Shopping'),
-        ('LoanOrSubscription', 'LoanOrSubscription'), ('Holiday', 'Holiday'), ('OtherExpense', 'OtherExpense')
-    ]
+    FIRST_CATEGORIES = list(dict.fromkeys(
+        category
+        for categories in CATEGORY_TREE.values()
+        for category in categories
+    ))
 
-    SECOND_CATEGORIES = [
-        ('Salary', 'Salary'), ('Bonus', 'Bonus'), ('ThirteenthSalary', 'ThirteenthSalary'),
-        ('Gift', 'Gift'), ('OtherIncome', 'OtherIncome'), ('Rent', 'Rent'),
-        ('Grocery', 'Grocery'), ('Bancomat', 'Bancomat'), ('Light', 'Light'), ('Fine', 'Fine'),
-        ('OtherBill', 'OtherBill'), ('Restourant', 'Restourant'), ('TakeAway', 'TakeAway'),
-        ('Bar', 'Bar'), ('Bank', 'Bank'), ('OtherTaxes', 'OtherTaxes'),
-        ('CarRent', 'CarRent'), ('PublicTransport', 'PublicTransport'),
-        ('Clothes', 'Clothes'), ('Technology', 'Technology'), ('Books', 'Books'),  ('OtherShopping', 'OtherShopping'),
-        ('Loan', 'Loan'), ('DAZN', 'DAZN'), ('PSPlus', 'PSPlus'), ('CrunchyRoll', 'CrunchyRoll'),
-        ('FantasyFootball', 'FantasyFootball'), ('Chess.com', 'Chess.com'), ('Telephone', 'Telephone'),
-        ('Generic', 'Generic'), ('Cigarettes', 'Cigarettes'), ('Present', 'Present'), ('Partner', 'Partner'),
-        ('Taxes', 'Taxes'), ('Other', 'Other')
-    ]
+    SECOND_CATEGORIES = list(dict.fromkeys(
+        subcategory
+        for categories in CATEGORY_TREE.values()
+        for subcategories in categories.values()
+        for subcategory in subcategories
+    ))
 
     type = SelectField(
-        'Type',
-        validators=[DataRequired(message="Select type..")],
-        choices=[("", "Select...")] + TYPES
+        "Type",
+        validators=[DataRequired(message="Select a transaction type.")],
+        choices=[("", "Select...")] + TYPES,
     )
 
     first_category = SelectField(
         "First Category",
-        validators=[DataRequired(message="Select category.")],
-        choices=[("", "Select...")] + FIRST_CATEGORIES,
+        validators=[DataRequired(message="Select a category.")],
+        choices=[("", "Select...")] + [
+            (name, name) for name in FIRST_CATEGORIES
+        ],
     )
 
     second_category = SelectField(
         "Second Category",
-        validators=[DataRequired(message="Select sub-category.")],
-        choices=[("", "Select...")] + SECOND_CATEGORIES,
+        validators=[DataRequired(message="Select a subcategory.")],
+        choices=[("", "Select...")] + [
+            (name, name) for name in SECOND_CATEGORIES
+        ],
     )
 
     date = DateField(
         "Date",
-        validators=[InputRequired(message="Insert date..")],
+        validators=[InputRequired(message="Enter a date.")],
         format="%Y-%m-%d",
         default=date.today,
     )
@@ -57,14 +54,38 @@ class UserInputForm(FlaskForm):
     amount = IntegerField(
         "Amount",
         validators=[
-            InputRequired(message="Insert amount.."),
+            InputRequired(message="Enter an amount."),
             NumberRange(
                 min=1,
-                message="Amount should be positive",
+                message="The amount must be greater than zero.",
             ),
         ],
     )
+
     submit = SubmitField("Add Transaction")
+
+    def validate_first_category(self, field):
+        categories = CATEGORY_TREE.get(self.type.data)
+
+        if categories is None:
+            return
+
+        if field.data not in categories:
+            raise ValidationError(
+                "The category does not belong to the selected transaction type."
+            )
+
+    def validate_second_category(self, field):
+        categories = CATEGORY_TREE.get(self.type.data, {})
+        subcategories = categories.get(self.first_category.data)
+
+        if subcategories is None:
+            return
+
+        if field.data not in subcategories:
+            raise ValidationError(
+                "The subcategory does not belong to the selected category."
+            )
 
 class SelectYearMonthForm(FlaskForm):
     year = datetime.today().year

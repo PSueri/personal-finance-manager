@@ -10,6 +10,8 @@ import calendar
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 
+from application.categories import CATEGORY_TREE
+
 @app.route("/")
 def index():
     return render_template('index.html', title='Home')
@@ -27,7 +29,12 @@ def add_transaction():
         db.session.commit()
         flash("Successful entry", 'success')
         return redirect(url_for('show_transactions'))
-    return render_template('add.html', title='Add', form=form)
+    return render_template(
+        "add.html",
+        title="Add",
+        form=form,
+        category_tree=CATEGORY_TREE,
+    )
 
 @app.route("/transactions")
 def show_transactions():
