@@ -23,7 +23,24 @@
                             <td>{{ entry.first_category }}</td>
                             <td>{{ entry.second_category }}</td>
                             <td>{{ entry.amount }}</td>
-                            <td><a href="{{ url_for('delete', entry_id = entry.id) }}" class="btn btn-outline-danger btn-sm">Delete</a></td>
+                            <td>
+                                <form
+                                    action="{{ url_for('delete', entry_id=entry.id) }}"
+                                    method="post"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="csrf_token"
+                                        value="{{ csrf_token() }}"
+                                    >
+                                    <button
+                                        type="submit"
+                                        class="btn btn-outline-danger btn-sm"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                 {% endfor %}
         </tbody>

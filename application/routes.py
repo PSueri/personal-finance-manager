@@ -170,10 +170,13 @@ def dashboard():
                            cat_inc_label_year=json.dumps(cat_inc_label_year),
                            selectionform=selectionform,
                            current_period=current_period)
-@app.route("/delete/<int:entry_id>")
+
+@app.route("/delete/<int:entry_id>", methods=["POST"])
 def delete(entry_id):
-    entry = TransactionHistory.query.get_or_404(int(entry_id))
+    entry = TransactionHistory.query.get_or_404(entry_id)
+
     db.session.delete(entry)
     db.session.commit()
+
     flash("Successful Deletion", 'success')
     return redirect(url_for('show_transactions'))
