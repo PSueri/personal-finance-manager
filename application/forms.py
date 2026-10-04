@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, IntegerField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, InputRequired, NumberRange
 from wtforms.fields import DateField
-from datetime import datetime
+from datetime import date, datetime
 
 
 class UserInputForm(FlaskForm):
@@ -29,15 +29,41 @@ class UserInputForm(FlaskForm):
         ('Taxes', 'Taxes'), ('Other', 'Other')
     ]
 
-    type = SelectField('Type', validators=[DataRequired()], choices=[('Select', ' ')] + TYPES)
+    type = SelectField(
+        'Type',
+        validators=[DataRequired(message="Select type..")],
+        choices=[("", "Select...")] + TYPES
+    )
 
-    first_category = SelectField('First Category', validators=[DataRequired()], choices=[('Select', ' ')] + FIRST_CATEGORIES)
+    first_category = SelectField(
+        "First Category",
+        validators=[DataRequired(message="Select category.")],
+        choices=[("", "Select...")] + FIRST_CATEGORIES,
+    )
 
-    second_category = SelectField('Second Category', validators=[DataRequired()], choices=[('Select', ' ')] + SECOND_CATEGORIES)
+    second_category = SelectField(
+        "Second Category",
+        validators=[DataRequired(message="Select sub-category.")],
+        choices=[("", "Select...")] + SECOND_CATEGORIES,
+    )
 
-    date = DateField('Date', validators=[DataRequired()], format='%Y-%m-%d', default=datetime.now())
+    date = DateField(
+        "Date",
+        validators=[InputRequired(message="Insert date..")],
+        format="%Y-%m-%d",
+        default=date.today,
+    )
 
-    amount = IntegerField('Amount', validators=[DataRequired()])
+    amount = IntegerField(
+        "Amount",
+        validators=[
+            InputRequired(message="Insert amount.."),
+            NumberRange(
+                min=1,
+                message="Amount should be positive",
+            ),
+        ],
+    )
     submit = SubmitField("Add Transaction")
 
 class SelectYearMonthForm(FlaskForm):
