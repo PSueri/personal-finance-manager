@@ -1,0 +1,9 @@
+**/venv
+
+**/.idea
+
+**/instance
+
+**/application/__pycache__
+
+.idea/*
