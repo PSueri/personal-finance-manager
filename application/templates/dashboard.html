@@ -129,6 +129,9 @@
     </div>
 {% block javascript %}
 <script>
+    function getAxisMinimum(values) {
+        return Math.min(0, ...values);
+    }
     Chart.scaleService.updateScaleDefaults('linear', {
             ticks: {
                 min: 0
@@ -211,7 +214,7 @@
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: Math.min(netflow_month)
+                        min: getAxisMinimum(netflow_month)
                     }
                 }
             }
@@ -249,7 +252,7 @@
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: Math.min(category_expenses_year_values),
+                        min: getAxisMinimum(category_expenses_year_values),
                     }
                 },
                 title: {
@@ -327,7 +330,7 @@
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: Math.min(category_expenses_values),
+                        min: getAxisMinimum(category_expenses_values),
                     }
                 },
                 title: {
@@ -409,7 +412,7 @@
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: Math.min(category_incomes_year_values),
+                        min: getAxisMinimum(category_incomes_year_values),
                     }
                 },
                 title: {
@@ -486,7 +489,7 @@
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: Math.min(category_incomes_values),
+                        min: getAxisMinimum(category_incomes_values),
                     }
                 },
                 title: {
