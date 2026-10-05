@@ -25,7 +25,7 @@
                             <td>{{ entry.amount }}</td>
                             <td>
                                 <form
-                                    action="{{ url_for('delete', entry_id=entry.id) }}"
+                                    action="{{ url_for('main.delete', entry_id=entry.id) }}"
                                     method="post"
                                 >
                                     <input

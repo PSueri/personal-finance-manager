@@ -1,4 +1,4 @@
-from application import app
+from flask import Blueprint
 from application.extensions import db
 from flask import render_template, flash, redirect, url_for, get_flashed_messages, request
 from application.forms import UserInputForm, SelectYearMonthForm
@@ -12,11 +12,13 @@ from datetime import datetime
 from application.categories import CATEGORY_TREE
 from application.reporting import get_last_twelve_month_labels
 
-@app.route("/")
+main_bp = Blueprint("main", __name__)
+
+@main_bp.route("/")
 def index():
     return render_template('index.html', title='Home')
 
-@app.route("/add", methods=["GET", "POST"])
+@main_bp.route("/add", methods=["GET", "POST"])
 def add_transaction():
     form = UserInputForm()
     if form.validate_on_submit():
@@ -28,7 +30,7 @@ def add_transaction():
         db.session.add(entry)
         db.session.commit()
         flash("Successful entry", 'success')
-        return redirect(url_for('show_transactions'))
+        return redirect(url_for('main.show_transactions'))
     return render_template(
         "add.html",
         title="Add",
@@ -36,12 +38,12 @@ def add_transaction():
         category_tree=CATEGORY_TREE,
     )
 
-@app.route("/transactions")
+@main_bp.route("/transactions")
 def show_transactions():
     entries=TransactionHistory.query.order_by(TransactionHistory.date.desc()).all()
     return render_template('show_transactions.html', title='Transactions', entries=entries)
 
-@app.route('/dashboard', methods=["GET", "POST"])
+@main_bp.route('/dashboard', methods=["GET", "POST"])
 def dashboard():
     # Get selected period
     selectionform = SelectYearMonthForm()
@@ -155,7 +157,7 @@ def dashboard():
                            selectionform=selectionform,
                            current_period=current_period)
 
-@app.route("/delete/<int:entry_id>", methods=["POST"])
+@main_bp.route("/delete/<int:entry_id>", methods=["POST"])
 def delete(entry_id):
     entry = TransactionHistory.query.get_or_404(entry_id)
 
@@ -163,4 +165,4 @@ def delete(entry_id):
     db.session.commit()
 
     flash("Successful Deletion", 'success')
-    return redirect(url_for('show_transactions'))
+    return redirect(url_for('main.show_transactions'))

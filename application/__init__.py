@@ -19,4 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///Transazioni.db'
 db.init_app(app)
 csrf.init_app(app)
 
-from application import routes
+from application.routes import main_bp
+
+app.register_blueprint(main_bp)
