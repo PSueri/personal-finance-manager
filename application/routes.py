@@ -1,8 +1,8 @@
-from application import app, db
+from application import app
+from application.extensions import db
 from flask import render_template, flash, redirect, url_for, get_flashed_messages, request
 from application.forms import UserInputForm, SelectYearMonthForm
 from application.models import TransactionHistory
-from flask_sqlalchemy import SQLAlchemy
 import json
 import requests
 import pandas as pd

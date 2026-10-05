@@ -1,5 +1,6 @@
-from application import db
+from application.extensions import db
 from datetime import datetime
+
 class TransactionHistory(db.Model):
     id=db.Column(db.Integer, primary_key=True)
     type=db.Column(db.String(30), default='Select', nullable=False)

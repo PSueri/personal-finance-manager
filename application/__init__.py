@@ -1,7 +1,8 @@
 import os
+
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect
+
+from application.extensions import db, csrf
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ if not secret_key:
 app.config["SECRET_KEY"] = secret_key
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///Transazioni.db'
 
-db = SQLAlchemy(app)
-csrf = CSRFProtect(app)
+db.init_app(app)
+csrf.init_app(app)
 
 from application import routes
