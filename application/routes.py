@@ -7,10 +7,10 @@ import json
 import requests
 import pandas as pd
 import calendar
-from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 from application.categories import CATEGORY_TREE
+from application.reporting import get_last_twelve_month_labels
 
 @app.route("/")
 def index():
@@ -43,29 +43,6 @@ def show_transactions():
 
 @app.route('/dashboard', methods=["GET", "POST"])
 def dashboard():
-    def get_date_range_df(format_string="%Y %b"):
-        """
-        This function generates an ordered list of dates in the specified format
-        from one year ago to the current month.
-
-        Args:
-            format_string (str, optional): The format string for the dates. Defaults to "%Y %b".
-
-        Returns:
-            list: A list of strings representing dates in the specified format.
-        """
-        today = datetime.today()
-        one_year_ago = today - timedelta(days=365) + relativedelta(months=1)
-
-        # Ensure the start date is at the beginning of the month
-        one_year_ago = one_year_ago.replace(day=1)
-
-        dates = []
-        while one_year_ago <= today:
-            dates.append(one_year_ago.strftime(format_string))
-            one_year_ago = one_year_ago + relativedelta(months=1)
-            dates_df = pd.DataFrame(dates, columns=['yearmonth'])
-        return dates_df
     # Get selected period
     selectionform = SelectYearMonthForm()
     if selectionform.validate_on_submit():
@@ -83,7 +60,7 @@ def dashboard():
     current_period = str(year)+', '+calendar.month_name[int(selmonth)]
     print(current_period)
 
-    one_year_dates = get_date_range_df()
+    one_year_dates = pd.DataFrame({"yearmonth": get_last_twelve_month_labels()})
 
     income_dates = db.session.query(db.func.sum(TransactionHistory.amount),
                                           TransactionHistory.date).filter_by(type='Income').group_by(
