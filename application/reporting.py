@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from application.extensions import db
 from application.models import TransactionHistory
 
@@ -24,8 +24,21 @@ def get_last_twelve_month_labels(reference_date=None):
     return labels
 
 def get_monthly_cashflow(reference_date=None):
-    """Return monthly income, expenses and net cash flow."""
+    """Return cash flow for twelve months ending with the reference month."""
+    if reference_date is None:
+        reference_date = date.today()
+
     labels = get_last_twelve_month_labels(reference_date)
+
+    current_month_index = (
+        reference_date.year * 12 + reference_date.month - 1
+    )
+
+    start_year, start_month = divmod(current_month_index - 11, 12)
+    end_year, end_month = divmod(current_month_index + 1, 12)
+
+    period_start = datetime(start_year, start_month + 1, 1)
+    period_end = datetime(end_year, end_month + 1, 1)
 
     monthly_totals = {
         label: {"income": 0, "expense": 0}
@@ -38,7 +51,11 @@ def get_monthly_cashflow(reference_date=None):
             TransactionHistory.date,
             db.func.sum(TransactionHistory.amount),
         )
-        .filter(TransactionHistory.type.in_(["Income", "Expense"]))
+        .filter(
+            TransactionHistory.type.in_(["Income", "Expense"]),
+            TransactionHistory.date >= period_start,
+            TransactionHistory.date < period_end,
+        )
         .group_by(
             TransactionHistory.type,
             TransactionHistory.date,
@@ -48,11 +65,8 @@ def get_monthly_cashflow(reference_date=None):
 
     for transaction_type, transaction_date, amount in rows:
         label = transaction_date.strftime("%Y %b")
-
-        if label not in monthly_totals:
-            continue
-
         key = "income" if transaction_type == "Income" else "expense"
+
         monthly_totals[label][key] += amount
 
     income = [
