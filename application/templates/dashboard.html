@@ -137,9 +137,10 @@
                 min: 0
             }
     });
-    income_month = JSON.parse({{income_month | tojson}})
-    expense_month = JSON.parse({{expense_month | tojson}})
-    labels = JSON.parse({{ dates_label  | tojson}})
+
+    const income_month = {{ income_month | tojson }};
+    const expense_month = {{ expense_month | tojson }};
+    const labels = {{ dates_label | tojson }};
     let income_vs_expense_chart = new Chart(income_vs_expense, {
             type: 'bar',
             data: {
@@ -197,7 +198,7 @@
             }
     });
 
-    netflow_month = JSON.parse({{netflow_month | tojson}})
+    const netflow_month = {{ netflow_month | tojson }};
     new Chart(document.getElementById("netflow"), {
             type: "line",
             data: {
@@ -220,18 +221,16 @@
             }
         });
 
-
-
     Chart.scaleService.updateScaleDefaults('linear', {
             ticks: {
                 min: 0
             }
     });
-    let category_expenses_values = JSON.parse({{ cat_exp_amount | tojson}})
-    let category_expenses_labels = JSON.parse({{ cat_exp_label  | tojson}})
-    let category_expenses_year_values = JSON.parse({{ cat_exp_amount_year | tojson}})
-    let category_expenses_year_labels = JSON.parse({{ cat_exp_label_year  | tojson}})
 
+    const category_expenses_values = {{ cat_exp_amount | tojson }};
+    const category_expenses_labels = {{ cat_exp_label | tojson }};
+    const category_expenses_year_values = {{ cat_exp_amount_year | tojson }};
+    const category_expenses_year_labels = {{ cat_exp_label_year | tojson }};
     let expenses_year_vs_category_chart = new Chart(expenses_year_vs_category, {
             type: 'bar',
             data: {
@@ -388,10 +387,10 @@
             }
         });
 
-    let category_incomes_values = JSON.parse({{ cat_inc_amount | tojson}})
-    let category_incomes_labels = JSON.parse({{ cat_inc_label  | tojson}})
-    let category_incomes_year_values = JSON.parse({{ cat_inc_amount_year | tojson}})
-    let category_incomes_year_labels = JSON.parse({{ cat_inc_label_year  | tojson}})
+    const category_incomes_values = {{ cat_inc_amount | tojson }};
+    const category_incomes_labels = {{ cat_inc_label | tojson }};
+    const category_incomes_year_values = {{ cat_inc_amount_year | tojson }};
+    const category_incomes_year_labels = {{ cat_inc_label_year | tojson }};
     let incomes_year_vs_category_chart = new Chart(incomes_year_vs_category, {
             type: 'bar',
             data: {

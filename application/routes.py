@@ -3,7 +3,6 @@ from application.extensions import db
 from flask import render_template, flash, redirect, url_for, get_flashed_messages, request
 from application.forms import UserInputForm, SelectYearMonthForm
 from application.models import TransactionHistory
-import json
 import requests
 import calendar
 from datetime import datetime
@@ -64,18 +63,18 @@ def dashboard():
     return render_template(
         "dashboard.html",
         title="Dashboard",
-        income_month=json.dumps(cashflow["income"]),
-        expense_month=json.dumps(cashflow["expense"]),
-        netflow_month=json.dumps(cashflow["netflow"]),
-        dates_label=json.dumps(cashflow["labels"]),
-        cat_exp_amount=json.dumps(monthly_categories["expense"]["amounts"]),
-        cat_exp_label=json.dumps(monthly_categories["expense"]["labels"]),
-        cat_exp_amount_year=json.dumps(yearly_categories["expense"]["amounts"]),
-        cat_exp_label_year=json.dumps(yearly_categories["expense"]["labels"]),
-        cat_inc_amount=json.dumps(monthly_categories["income"]["amounts"]),
-        cat_inc_label=json.dumps(monthly_categories["income"]["labels"]),
-        cat_inc_amount_year=json.dumps(yearly_categories["income"]["amounts"]),
-        cat_inc_label_year=json.dumps(yearly_categories["income"]["labels"]),
+        income_month=cashflow["income"],
+        expense_month=cashflow["expense"],
+        netflow_month=cashflow["netflow"],
+        dates_label=cashflow["labels"],
+        cat_exp_amount=monthly_categories["expense"]["amounts"],
+        cat_exp_label=monthly_categories["expense"]["labels"],
+        cat_exp_amount_year=yearly_categories["expense"]["amounts"],
+        cat_exp_label_year=yearly_categories["expense"]["labels"],
+        cat_inc_amount=monthly_categories["income"]["amounts"],
+        cat_inc_label=monthly_categories["income"]["labels"],
+        cat_inc_amount_year=yearly_categories["income"]["amounts"],
+        cat_inc_label_year=yearly_categories["income"]["labels"],
         selectionform=selectionform,
         current_period=current_period,
     )
