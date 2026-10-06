@@ -90,3 +90,53 @@ def get_monthly_cashflow(reference_date=None):
         "expense": expense,
         "netflow": netflow,
     }
+
+def _query_category_totals(transaction_type, period_start, period_end):
+    if transaction_type == "Expense":
+        category_column = TransactionHistory.first_category
+    else:
+        category_column = TransactionHistory.second_category
+
+    rows = (
+        db.session.query(
+            category_column,
+            db.func.sum(TransactionHistory.amount),
+        )
+        .filter(
+            TransactionHistory.type == transaction_type,
+            TransactionHistory.date >= period_start,
+            TransactionHistory.date < period_end,
+        )
+        .group_by(category_column)
+        .order_by(category_column)
+        .all()
+    )
+
+    return {
+        "labels": [category for category, _ in rows],
+        "amounts": [amount for _, amount in rows],
+    }
+
+
+def get_category_totals(year, month=None):
+    """Return income and expense totals by category for a month or year."""
+    year = int(year)
+
+    if month is None:
+        period_start = datetime(year, 1, 1)
+        period_end = datetime(year + 1, 1, 1)
+    else:
+        month = int(month)
+
+        if not 1 <= month <= 12:
+            raise ValueError("Month must be between 1 and 12.")
+
+        period_start = datetime(year, month, 1)
+
+        next_year, next_month = divmod(year * 12 + month, 12)
+        period_end = datetime(next_year, next_month + 1, 1)
+
+    return {
+        "income": _query_category_totals("Income", period_start, period_end),
+        "expense": _query_category_totals("Expense", period_start, period_end),
+    }

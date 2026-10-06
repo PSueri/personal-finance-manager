@@ -9,7 +9,8 @@ import calendar
 from datetime import datetime
 
 from application.categories import CATEGORY_TREE
-from application.reporting import get_monthly_cashflow
+from application.reporting import get_category_totals, get_monthly_cashflow
+
 
 main_bp = Blueprint("main", __name__)
 
@@ -42,75 +43,42 @@ def show_transactions():
     entries=TransactionHistory.query.order_by(TransactionHistory.date.desc()).all()
     return render_template('show_transactions.html', title='Transactions', entries=entries)
 
-@main_bp.route('/dashboard', methods=["GET", "POST"])
+@main_bp.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    # Get selected period
     selectionform = SelectYearMonthForm()
+    today = datetime.now()
+
+    year = today.year
+    month = today.month
+
     if selectionform.validate_on_submit():
-        year = selectionform.selected_year.data
-        selmonth = selectionform.selected_month.data
-    else:
-        year = 0
-        selmonth = 0
-    # Set default values if not provided
-    if not int(year):
-        year = datetime.now().year
-    if not int(selmonth):
-        selmonth = datetime.now().month
+        year = int(selectionform.selected_year.data) or today.year
+        month = int(selectionform.selected_month.data) or today.month
 
-    current_period = str(year)+', '+calendar.month_name[int(selmonth)]
-
-    category_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
-                                           TransactionHistory.first_category).filter_by(type='Expense').filter(
-                                            db.func.extract('year',TransactionHistory.date) == year).filter(
-                                            db.func.extract('month',TransactionHistory.date) == selmonth).group_by(
-                                             TransactionHistory.first_category).order_by(
-                                             TransactionHistory.first_category).all()
-    category_expenses_year = db.session.query(db.func.sum(TransactionHistory.amount),
-                                           TransactionHistory.first_category).filter_by(type='Expense').filter(
-                                            db.func.extract('year',TransactionHistory.date) == year).group_by(
-                                             TransactionHistory.first_category).order_by(
-                                             TransactionHistory.first_category).all()
-    category_incomes = db.session.query(db.func.sum(TransactionHistory.amount),
-                                           TransactionHistory.second_category).filter_by(type='Income').filter(
-                                            db.func.extract('year',TransactionHistory.date) == year).filter(
-                                            db.func.extract('month',TransactionHistory.date) == selmonth).group_by(
-                                            TransactionHistory.second_category).order_by(
-                                            TransactionHistory.second_category).all()
-    category_incomes_year = db.session.query(db.func.sum(TransactionHistory.amount),
-                                           TransactionHistory.second_category).filter_by(type='Income').filter(
-                                            db.func.extract('year',TransactionHistory.date) == year).group_by(
-                                            TransactionHistory.second_category).order_by(
-                                            TransactionHistory.second_category).all()
-
-    # Create lists using list comprehension for monthly and yearly category amounts
-    cat_exp_label = [category for _, category in category_expenses]
-    cat_exp_amount = [amount for amount, _ in category_expenses]
-    cat_exp_label_year = [category for _, category in category_expenses_year]
-    cat_exp_amount_year = [amount for amount, _ in category_expenses_year]
-
-    cat_inc_label = [category for _, category in category_incomes]
-    cat_inc_amount = [amount for amount, _ in category_incomes]
-    cat_inc_label_year = [category for _, category in category_incomes_year]
-    cat_inc_amount_year = [amount for amount, _ in category_incomes_year]
+    current_period = f"{year}, {calendar.month_name[month]}"
 
     cashflow = get_monthly_cashflow()
+    monthly_categories = get_category_totals(year, month)
+    yearly_categories = get_category_totals(year)
 
-    return render_template('dashboard.html', title='Dashboard',
-                           income_month=json.dumps(cashflow["income"]),
-                           expense_month=json.dumps(cashflow["expense"]),
-                           netflow_month=json.dumps(cashflow["netflow"]),
-                           dates_label=json.dumps(cashflow["labels"]),
-                           cat_exp_amount=json.dumps(cat_exp_amount),
-                           cat_exp_label=json.dumps(cat_exp_label),
-                           cat_exp_amount_year=json.dumps(cat_exp_amount_year),
-                           cat_exp_label_year=json.dumps(cat_exp_label_year),
-                           cat_inc_amount=json.dumps(cat_inc_amount),
-                           cat_inc_label=json.dumps(cat_inc_label),
-                           cat_inc_amount_year=json.dumps(cat_inc_amount_year),
-                           cat_inc_label_year=json.dumps(cat_inc_label_year),
-                           selectionform=selectionform,
-                           current_period=current_period)
+    return render_template(
+        "dashboard.html",
+        title="Dashboard",
+        income_month=json.dumps(cashflow["income"]),
+        expense_month=json.dumps(cashflow["expense"]),
+        netflow_month=json.dumps(cashflow["netflow"]),
+        dates_label=json.dumps(cashflow["labels"]),
+        cat_exp_amount=json.dumps(monthly_categories["expense"]["amounts"]),
+        cat_exp_label=json.dumps(monthly_categories["expense"]["labels"]),
+        cat_exp_amount_year=json.dumps(yearly_categories["expense"]["amounts"]),
+        cat_exp_label_year=json.dumps(yearly_categories["expense"]["labels"]),
+        cat_inc_amount=json.dumps(monthly_categories["income"]["amounts"]),
+        cat_inc_label=json.dumps(monthly_categories["income"]["labels"]),
+        cat_inc_amount_year=json.dumps(yearly_categories["income"]["amounts"]),
+        cat_inc_label_year=json.dumps(yearly_categories["income"]["labels"]),
+        selectionform=selectionform,
+        current_period=current_period,
+    )
 
 @main_bp.route("/delete/<int:entry_id>", methods=["POST"])
 def delete(entry_id):
