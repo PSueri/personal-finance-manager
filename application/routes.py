@@ -5,12 +5,11 @@ from application.forms import UserInputForm, SelectYearMonthForm
 from application.models import TransactionHistory
 import json
 import requests
-import pandas as pd
 import calendar
 from datetime import datetime
 
 from application.categories import CATEGORY_TREE
-from application.reporting import get_last_twelve_month_labels
+from application.reporting import get_monthly_cashflow
 
 main_bp = Blueprint("main", __name__)
 
@@ -60,18 +59,7 @@ def dashboard():
         selmonth = datetime.now().month
 
     current_period = str(year)+', '+calendar.month_name[int(selmonth)]
-    print(current_period)
 
-    one_year_dates = pd.DataFrame({"yearmonth": get_last_twelve_month_labels()})
-
-    income_dates = db.session.query(db.func.sum(TransactionHistory.amount),
-                                          TransactionHistory.date).filter_by(type='Income').group_by(
-                                            TransactionHistory.date).order_by(
-                                                TransactionHistory.date.desc()).all()
-    expense_dates = db.session.query(db.func.sum(TransactionHistory.amount),
-                                          TransactionHistory.date).filter_by(type='Expense').group_by(
-                                            TransactionHistory.date).order_by(
-                                                TransactionHistory.date.desc()).all()
     category_expenses = db.session.query(db.func.sum(TransactionHistory.amount),
                                            TransactionHistory.first_category).filter_by(type='Expense').filter(
                                             db.func.extract('year',TransactionHistory.date) == year).filter(
@@ -95,41 +83,6 @@ def dashboard():
                                             TransactionHistory.second_category).order_by(
                                             TransactionHistory.second_category).all()
 
-    income_dict = {
-        "income": [amount for amount, _ in income_dates],
-        "yearmonth": [f"{date.year} {calendar.month_abbr[date.month]}" for _, date in income_dates]
-    }
-
-    expense_dict = {
-        "expense": [amount for amount, _ in expense_dates],
-        "yearmonth": [f"{date.year} {calendar.month_abbr[date.month]}" for _, date in expense_dates]
-    }
-
-    # Create DataFrames for income and expenses
-    income_df = pd.DataFrame(income_dict)
-    expense_df = pd.DataFrame(expense_dict)
-
-    # Group and sum using DataFrame methods
-    income_grouped = income_df.groupby("yearmonth", as_index=False).sum()
-    expense_grouped = expense_df.groupby("yearmonth", as_index=False).sum()
-
-    # join df
-    income_expense_dates_df = (one_year_dates.merge(income_grouped, on='yearmonth', how='left').fillna(0)
-                               .merge(expense_grouped, on='yearmonth', how='left').fillna(0))
-    income_expense_dates_df["netflow"] = income_expense_dates_df["income"] - income_expense_dates_df["expense"]
-    income_expense_dates_df["month"] = pd.to_datetime(income_expense_dates_df["yearmonth"], format='%Y %b').dt.month
-    income_expense_dates_df["year"] = pd.to_datetime(income_expense_dates_df["yearmonth"], format='%Y %b').dt.year
-    income_expense_dates_df=income_expense_dates_df.sort_values(by=['year', 'month'], ascending=True)
-
-    # netflow
-    netflow_month = income_expense_dates_df['netflow'].tolist()
-    # label
-    dates_label = income_expense_dates_df['yearmonth'].tolist()
-    # incomes
-    income_month = income_expense_dates_df['income'].tolist()
-    # expenses
-    expense_month = income_expense_dates_df['expense'].tolist()
-
     # Create lists using list comprehension for monthly and yearly category amounts
     cat_exp_label = [category for _, category in category_expenses]
     cat_exp_amount = [amount for amount, _ in category_expenses]
@@ -141,11 +94,13 @@ def dashboard():
     cat_inc_label_year = [category for _, category in category_incomes_year]
     cat_inc_amount_year = [amount for amount, _ in category_incomes_year]
 
+    cashflow = get_monthly_cashflow()
+
     return render_template('dashboard.html', title='Dashboard',
-                           income_month=json.dumps(income_month),
-                           expense_month=json.dumps(expense_month),
-                           netflow_month=json.dumps(netflow_month),
-                           dates_label=json.dumps(dates_label),
+                           income_month=json.dumps(cashflow["income"]),
+                           expense_month=json.dumps(cashflow["expense"]),
+                           netflow_month=json.dumps(cashflow["netflow"]),
+                           dates_label=json.dumps(cashflow["labels"]),
                            cat_exp_amount=json.dumps(cat_exp_amount),
                            cat_exp_label=json.dumps(cat_exp_label),
                            cat_exp_amount_year=json.dumps(cat_exp_amount_year),
