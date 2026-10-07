@@ -48,10 +48,14 @@ def dashboard():
 
     year = today.year
     month = today.month
+    status_code = 200
 
-    if selectionform.validate_on_submit():
-        year = int(selectionform.selected_year.data) or today.year
-        month = int(selectionform.selected_month.data) or today.month
+    if request.method == "POST":
+        if selectionform.validate_on_submit():
+            year = selectionform.selected_year.data
+            month = selectionform.selected_month.data
+        else:
+            status_code = 400
 
     current_period = f"{year}, {calendar.month_name[month]}"
 
@@ -76,7 +80,7 @@ def dashboard():
         cat_inc_label_year=yearly_categories["income"]["labels"],
         selectionform=selectionform,
         current_period=current_period,
-    )
+    ), status_code
 
 @main_bp.route("/delete/<int:entry_id>", methods=["POST"])
 def delete(entry_id):

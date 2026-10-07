@@ -88,15 +88,42 @@ class UserInputForm(FlaskForm):
             )
 
 class SelectYearMonthForm(FlaskForm):
-    year = datetime.today().year
-    YEARS = [
-        (year, str(year)), (year-1, str(year-1)), (year-2, str(year-2)), (year-3, str(year-3)), (year-4, str(year-4))
-    ]
     MONTHS = [
-        (1, 'Jan'), (2, 'Feb'), (3, 'Mar'), (4, 'Apr'), (5, 'May'), (6, 'Jun'),
-        (7, 'Jul'), (8, 'Aug'), (9, 'Sep'), (10, 'Oct'), (11, 'Nov'), (12, 'Dec')
+        (1, "Jan"), (2, "Feb"), (3, "Mar"), (4, "Apr"),
+        (5, "May"), (6, "Jun"), (7, "Jul"), (8, "Aug"),
+        (9, "Sep"), (10, "Oct"), (11, "Nov"), (12, "Dec"),
     ]
 
-    selected_year = SelectField('Select a Year', validators=[DataRequired()], choices=[(0, ' ')] + YEARS)
-    selected_month = SelectField('Select a Month', validators=[DataRequired()], choices=[(0, ' ')] + MONTHS)
+    selected_year = SelectField(
+        "Select a Year",
+        coerce=int,
+        validators=[
+            InputRequired(message="Select a year."),
+            NumberRange(min=1, message="Select a valid year."),
+        ],
+        default=lambda: datetime.today().year,
+    )
+
+    selected_month = SelectField(
+        "Select a Month",
+        coerce=int,
+        choices=[(0, "Select...")] + MONTHS,
+        validators=[
+            InputRequired(message="Select a month."),
+            NumberRange(
+                min=1,
+                max=12,
+                message="Select a valid month.",
+            ),
+        ],
+        default=lambda: datetime.today().month,
+    )
+
     submit = SubmitField("Refresh Data")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        current_year = datetime.today().year
+
+        self.selected_year.choices = [(0, "Select...")] + [(year, str(year)) for year in range(current_year, current_year - 5, -1)]

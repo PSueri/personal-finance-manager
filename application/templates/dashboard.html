@@ -26,6 +26,22 @@
             <div class="card-body">
                 <form action="" method="POST">
                     {{ selectionform.csrf_token() }}
+                    {% if selectionform.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            <p>
+                                The selected period is invalid.
+                                Reports are showing the current month and year.
+                            </p>
+
+                            <ul class="mb-0">
+                                {% for field_name, errors in selectionform.errors.items() %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                     <fieldset class="form-group">
                         <h5>Current selected period: {{current_period}}</h5>
                         <legend class="mb-4">Select a Period</legend>
