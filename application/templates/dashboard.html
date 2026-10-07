@@ -25,7 +25,7 @@
         <div class="card card-style mb-2 mx-auto" >
             <div class="card-body">
                 <form action="" method="POST">
-                    {{ selectionform.csrf_token() }}
+                    {{ selectionform.hidden_tag() }}
                     {% if selectionform.errors %}
                         <div class="alert alert-danger" role="alert">
                             <p>

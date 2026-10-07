@@ -5,7 +5,7 @@
         <div class="card card-style mb-2">
             <div class="card-body">
                 <form action="" method="POST">
-                    {{ form.csrf_token() }}
+                    {{ form.hidden_tag() }}
                     {% for field in [
                         form.type,
                         form.first_category,
