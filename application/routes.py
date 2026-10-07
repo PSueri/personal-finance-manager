@@ -38,8 +38,25 @@ def add_transaction():
 
 @main_bp.route("/transactions")
 def show_transactions():
-    entries=TransactionHistory.query.order_by(TransactionHistory.date.desc()).all()
-    return render_template('show_transactions.html', title='Transactions', entries=entries)
+    page = request.args.get("page", default=1, type=int)
+
+    pagination = db.paginate(
+        db.select(TransactionHistory).order_by(
+            TransactionHistory.date.desc(),
+            TransactionHistory.id.desc(),
+        ),
+        page=page,
+        per_page=20,
+        max_per_page=20,
+        error_out=True,
+    )
+
+    return render_template(
+        "show_transactions.html",
+        title="Transactions",
+        entries=pagination.items,
+        pagination=pagination,
+    )
 
 @main_bp.route("/dashboard", methods=["GET", "POST"])
 def dashboard():

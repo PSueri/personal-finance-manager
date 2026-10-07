@@ -17,7 +17,7 @@
             <tbody>
                 {% for entry in entries %}
                         <tr>
-                            <th scope="row">{{loop.index}}</th>
+                            <th scope="row">{{ entry.id }}</th>
                             <td>{{entry.date.strftime("%d-%m-%Y")}}</td>
                             <td>{{entry.type}}</td>
                             <td>{{ entry.first_category }}</td>
@@ -45,5 +45,41 @@
                 {% endfor %}
         </tbody>
         </table>
+        {% if pagination.total == 0 %}
+            <p>No transactions yet.</p>
+        {% else %}
+            <p>
+                Showing {{ pagination.first }}–{{ pagination.last }}
+                of {{ pagination.total }} transactions.
+            </p>
+        {% endif %}
+
+        {% if pagination.pages > 1 %}
+            <nav aria-label="Transaction pages">
+                <ul class="pagination">
+                    {% if pagination.has_prev %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.show_transactions', page=pagination.prev_num) }}">
+                                Previous
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    <li class="page-item active">
+                        <span class="page-link" aria-current="page">
+                            {{ pagination.page }} / {{ pagination.pages }}
+                        </span>
+                    </li>
+
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('main.show_transactions', page=pagination.next_num) }}">
+                                Next
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
     </div>
 {% endblock %}
