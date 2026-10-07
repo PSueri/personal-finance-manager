@@ -1,31 +1,13 @@
 import unittest
 from datetime import datetime
 
-from application import create_app
 from application.extensions import db
 from application.models import TransactionHistory
 from application.reporting import get_category_totals
+from tests.base import DatabaseTestCase
 
 
-class TestCategoryReporting(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app({
-            "TESTING": True,
-            "SECRET_KEY": "test-only-secret",
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-        })
-
-        self.context = self.app.app_context()
-        self.context.push()
-
-        db.create_all()
-
-    def tearDown(self):
-        try:
-            db.session.remove()
-            db.drop_all()
-        finally:
-            self.context.pop()
+class TestCategoryReporting(DatabaseTestCase):
 
     def add_transaction(
         self,

@@ -2,9 +2,9 @@ import unittest
 from datetime import datetime
 from html.parser import HTMLParser
 
-from application import create_app
 from application.extensions import db
 from application.models import TransactionHistory
+from tests.base import DatabaseTestCase
 
 
 class CSRFTokenParser(HTMLParser):
@@ -19,27 +19,7 @@ class CSRFTokenParser(HTMLParser):
             self.token = attributes.get("value")
 
 
-class TestTransactionRoutes(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app({
-            "TESTING": True,
-            "SECRET_KEY": "test-only-secret",
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-            "WTF_CSRF_ENABLED": True,
-        })
-
-        self.context = self.app.app_context()
-        self.context.push()
-
-        db.create_all()
-        self.client = self.app.test_client()
-
-    def tearDown(self):
-        try:
-            db.session.remove()
-            db.drop_all()
-        finally:
-            self.context.pop()
+class TestTransactionRoutes(DatabaseTestCase):
 
     def get_csrf_token(self):
         response = self.client.get("/add")

@@ -2,32 +2,14 @@ import calendar
 import unittest
 from datetime import datetime
 
-from application import create_app
-from application.extensions import db
 from application.forms import SelectYearMonthForm
+from tests.base import DatabaseTestCase
 
 
-class TestDashboardPeriod(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app({
-            "TESTING": True,
-            "SECRET_KEY": "test-only-secret",
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-            "WTF_CSRF_ENABLED": False,
-        })
-
-        self.context = self.app.app_context()
-        self.context.push()
-
-        db.create_all()
-        self.client = self.app.test_client()
-
-    def tearDown(self):
-        try:
-            db.session.remove()
-            db.drop_all()
-        finally:
-            self.context.pop()
+class TestDashboardPeriod(DatabaseTestCase):
+    APP_CONFIG = {
+        "WTF_CSRF_ENABLED": False,
+    }
 
     def validate_form(self, **changes):
         today = datetime.today()

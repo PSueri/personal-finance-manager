@@ -4,32 +4,15 @@ from unittest.mock import patch
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from application import create_app
 from application.extensions import db
 from application.models import TransactionHistory
+from tests.base import DatabaseTestCase
 
 
-class TestTransactionWriteErrors(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app({
-            "TESTING": True,
-            "SECRET_KEY": "test-only-secret",
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-            "WTF_CSRF_ENABLED": False,
-        })
-
-        self.context = self.app.app_context()
-        self.context.push()
-
-        db.create_all()
-        self.client = self.app.test_client()
-
-    def tearDown(self):
-        try:
-            db.session.remove()
-            db.drop_all()
-        finally:
-            self.context.pop()
+class TestTransactionWriteErrors(DatabaseTestCase):
+    APP_CONFIG = {
+        "WTF_CSRF_ENABLED": False,
+    }
 
     def transaction_data(self):
         return {
