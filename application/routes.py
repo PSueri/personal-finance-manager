@@ -1,4 +1,5 @@
-from flask import Blueprint, abort, render_template, flash, redirect, url_for, get_flashed_messages, request
+from flask import Blueprint, abort, render_template, flash, redirect, url_for, get_flashed_messages, request, current_app
+from sqlalchemy.exc import SQLAlchemyError
 from application.extensions import db
 from application.forms import UserInputForm, SelectYearMonthForm
 from application.models import TransactionHistory
@@ -19,22 +20,42 @@ def index():
 @main_bp.route("/add", methods=["GET", "POST"])
 def add_transaction():
     form = UserInputForm()
+    status_code = 200
+
     if form.validate_on_submit():
-        entry=TransactionHistory(type=form.type.data,
-                                 first_category=form.first_category.data,
-                                 second_category=form.second_category.data,
-                                 amount=form.amount.data,
-                                 date=form.date.data)
-        db.session.add(entry)
-        db.session.commit()
-        flash("Successful entry", 'success')
-        return redirect(url_for('main.show_transactions'))
+        entry = TransactionHistory(
+            type=form.type.data,
+            first_category=form.first_category.data,
+            second_category=form.second_category.data,
+            amount=form.amount.data,
+            date=form.date.data,
+        )
+
+        try:
+            db.session.add(entry)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+
+            current_app.logger.exception(
+                "Failed to save transaction."
+            )
+
+            flash(
+                "The transaction could not be saved. Please try again.",
+                "danger",
+            )
+            status_code = 503
+        else:
+            flash("Successful entry", "success")
+            return redirect(url_for("main.show_transactions"))
+
     return render_template(
         "add.html",
         title="Add",
         form=form,
         category_tree=CATEGORY_TREE,
-    )
+    ), status_code
 
 @main_bp.route("/transactions")
 def show_transactions():
@@ -106,8 +127,21 @@ def delete(entry_id):
     if entry is None:
         abort(404)
 
-    db.session.delete(entry)
-    db.session.commit()
+    try:
+        db.session.delete(entry)
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
 
-    flash("Successful Deletion", "success")
+        current_app.logger.exception(
+            "Failed to delete transaction."
+        )
+
+        flash(
+            "The transaction could not be deleted. Please try again.",
+            "danger",
+        )
+    else:
+        flash("Successful Deletion", "success")
+
     return redirect(url_for("main.show_transactions"))
