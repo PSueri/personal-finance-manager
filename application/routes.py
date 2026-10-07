@@ -1,6 +1,5 @@
-from flask import Blueprint
+from flask import Blueprint, abort, render_template, flash, redirect, url_for, get_flashed_messages, request
 from application.extensions import db
-from flask import render_template, flash, redirect, url_for, get_flashed_messages, request
 from application.forms import UserInputForm, SelectYearMonthForm
 from application.models import TransactionHistory
 import requests
@@ -81,10 +80,13 @@ def dashboard():
 
 @main_bp.route("/delete/<int:entry_id>", methods=["POST"])
 def delete(entry_id):
-    entry = TransactionHistory.query.get_or_404(entry_id)
+    entry = db.session.get(TransactionHistory, entry_id)
+
+    if entry is None:
+        abort(404)
 
     db.session.delete(entry)
     db.session.commit()
 
-    flash("Successful Deletion", 'success')
-    return redirect(url_for('main.show_transactions'))
+    flash("Successful Deletion", "success")
+    return redirect(url_for("main.show_transactions"))
