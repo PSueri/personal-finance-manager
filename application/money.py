@@ -21,3 +21,10 @@ def parse_amount_to_cents(amount_text):
         raise ValueError("The amount must be greater than zero.")
 
     return cents
+
+def format_cents(amount_cents):
+    """Format integer cents using two decimal places and a decimal comma."""
+    sign = "-" if amount_cents < 0 else ""
+    euros, cents = divmod(abs(amount_cents), 100)
+
+    return f"{sign}{euros},{cents:02d}"

@@ -1,6 +1,6 @@
 import unittest
 
-from application.money import parse_amount_to_cents
+from application.money import format_cents, parse_amount_to_cents
 
 
 class TestAmountConversion(unittest.TestCase):
@@ -43,6 +43,30 @@ class TestAmountConversion(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     parse_amount_to_cents(text)
 
+class TestAmountFormatting(unittest.TestCase):
+    def test_non_negative_amounts_are_formatted_with_two_decimal_places(self):
+        cases = [
+            (0, "0,00"),
+            (1, "0,01"),
+            (10, "0,10"),
+            (100, "1,00"),
+            (1250, "12,50"),
+            (10000, "100,00"),
+        ]
+
+        for cents, expected in cases:
+            with self.subTest(cents=cents):
+                self.assertEqual(format_cents(cents), expected)
+
+    def test_negative_amounts_preserve_the_sign(self):
+        cases = [
+            (-1, "-0,01"),
+            (-1250, "-12,50"),
+        ]
+
+        for cents, expected in cases:
+            with self.subTest(cents=cents):
+                self.assertEqual(format_cents(cents), expected)
 
 if __name__ == "__main__":
     unittest.main()
