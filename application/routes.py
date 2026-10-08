@@ -22,12 +22,15 @@ from application.reporting import get_category_totals, get_monthly_cashflow
 
 main_bp = Blueprint("main", __name__)
 
+
 def chart_amounts(amounts_cents):
     return [amount / 100 for amount in amounts_cents]
 
+
 @main_bp.route("/")
 def index():
-    return render_template('index.html', title='Home')
+    return render_template("index.html", title="Home")
+
 
 @main_bp.route("/add", methods=["GET", "POST"])
 def add_transaction():
@@ -49,9 +52,7 @@ def add_transaction():
         except SQLAlchemyError:
             db.session.rollback()
 
-            current_app.logger.exception(
-                "Failed to save transaction."
-            )
+            current_app.logger.exception("Failed to save transaction.")
 
             flash(
                 "The transaction could not be saved. Please try again.",
@@ -68,6 +69,7 @@ def add_transaction():
         form=form,
         category_tree=CATEGORY_TREE,
     ), status_code
+
 
 @main_bp.route("/transactions")
 def show_transactions():
@@ -90,6 +92,7 @@ def show_transactions():
         entries=pagination.items,
         pagination=pagination,
     )
+
 
 @main_bp.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
@@ -132,6 +135,7 @@ def dashboard():
         current_period=current_period,
     ), status_code
 
+
 @main_bp.route("/delete/<int:entry_id>", methods=["POST"])
 def delete(entry_id):
     entry = db.session.get(TransactionHistory, entry_id)
@@ -145,9 +149,7 @@ def delete(entry_id):
     except SQLAlchemyError:
         db.session.rollback()
 
-        current_app.logger.exception(
-            "Failed to delete transaction."
-        )
+        current_app.logger.exception("Failed to delete transaction.")
 
         flash(
             "The transaction could not be deleted. Please try again.",

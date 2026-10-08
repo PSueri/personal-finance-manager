@@ -116,9 +116,7 @@ class TestTransactionWriteErrors(DatabaseTestCase):
         )
         self.assertNotIn("Successful Deletion", html)
         self.assertEqual(TransactionHistory.query.count(), 1)
-        self.assertIsNotNone(
-            db.session.get(TransactionHistory, entry_id)
-        )
+        self.assertIsNotNone(db.session.get(TransactionHistory, entry_id))
 
         retry = self.client.post(f"/delete/{entry_id}")
 

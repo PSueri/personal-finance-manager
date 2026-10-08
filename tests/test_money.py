@@ -61,6 +61,7 @@ class TestAmountConversion(unittest.TestCase):
                 ):
                     parse_amount_to_cents(amount)
 
+
 class TestAmountFormatting(unittest.TestCase):
     def test_non_negative_amounts_are_formatted_with_two_decimal_places(self):
         cases = [
@@ -85,6 +86,7 @@ class TestAmountFormatting(unittest.TestCase):
         for cents, expected in cases:
             with self.subTest(cents=cents):
                 self.assertEqual(format_cents(cents), expected)
+
 
 if __name__ == "__main__":
     unittest.main()

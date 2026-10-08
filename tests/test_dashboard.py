@@ -50,9 +50,7 @@ class TestDashboardPeriod(DatabaseTestCase):
     def test_invalid_months_are_rejected(self):
         for month in ["0", "13", "abc"]:
             with self.subTest(month=month):
-                form, is_valid = self.validate_form(
-                    selected_month=month
-                )
+                form, is_valid = self.validate_form(selected_month=month)
 
                 self.assertFalse(is_valid)
                 self.assertIn("selected_month", form.errors)
@@ -62,18 +60,14 @@ class TestDashboardPeriod(DatabaseTestCase):
 
         for year in ["0", unavailable_year, "abc"]:
             with self.subTest(year=year):
-                form, is_valid = self.validate_form(
-                    selected_year=year
-                )
+                form, is_valid = self.validate_form(selected_year=year)
 
                 self.assertFalse(is_valid)
                 self.assertIn("selected_year", form.errors)
 
     def test_dashboard_get_shows_current_period(self):
         today = datetime.today()
-        expected_period = (
-            f"{today.year}, {calendar.month_name[today.month]}"
-        )
+        expected_period = f"{today.year}, {calendar.month_name[today.month]}"
 
         response = self.client.get("/dashboard")
 
@@ -86,9 +80,7 @@ class TestDashboardPeriod(DatabaseTestCase):
     def test_valid_post_shows_selected_period(self):
         selected_year = datetime.today().year - 1
         selected_month = 2
-        expected_period = (
-            f"{selected_year}, {calendar.month_name[selected_month]}"
-        )
+        expected_period = f"{selected_year}, {calendar.month_name[selected_month]}"
 
         response = self.client.post(
             "/dashboard",
@@ -106,9 +98,7 @@ class TestDashboardPeriod(DatabaseTestCase):
 
     def test_invalid_post_shows_error_and_current_period(self):
         today = datetime.today()
-        expected_period = (
-            f"{today.year}, {calendar.month_name[today.month]}"
-        )
+        expected_period = f"{today.year}, {calendar.month_name[today.month]}"
 
         response = self.client.post(
             "/dashboard",

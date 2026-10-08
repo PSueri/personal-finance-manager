@@ -8,7 +8,6 @@ from tests.base import DatabaseTestCase
 
 
 class TestCategoryReporting(DatabaseTestCase):
-
     def add_transaction(
         self,
         transaction_type,
@@ -17,13 +16,15 @@ class TestCategoryReporting(DatabaseTestCase):
         amount,
         transaction_date,
     ):
-        db.session.add(TransactionHistory(
-            type=transaction_type,
-            first_category=category,
-            second_category=subcategory,
-            amount_cents=amount,
-            date=transaction_date,
-        ))
+        db.session.add(
+            TransactionHistory(
+                type=transaction_type,
+                first_category=category,
+                second_category=subcategory,
+                amount_cents=amount,
+                date=transaction_date,
+            )
+        )
 
     def test_empty_period_returns_empty_lists(self):
         expected = {
@@ -53,35 +54,56 @@ class TestCategoryReporting(DatabaseTestCase):
 
         result = get_category_totals(2024, 3)
 
-        self.assertEqual(result["income"], {
-            "labels": ["Bonus", "Salary"],
-            "amounts": [50, 1200],
-        })
-        self.assertEqual(result["expense"], {
-            "labels": ["Food", "Home"],
-            "amounts": [30, 500],
-        })
+        self.assertEqual(
+            result["income"],
+            {
+                "labels": ["Bonus", "Salary"],
+                "amounts": [50, 1200],
+            },
+        )
+        self.assertEqual(
+            result["expense"],
+            {
+                "labels": ["Food", "Home"],
+                "amounts": [30, 500],
+            },
+        )
 
     def test_yearly_totals_include_only_the_selected_year(self):
         transactions = [
             (
-                "Income", "Work", "Salary", 9000,
+                "Income",
+                "Work",
+                "Salary",
+                9000,
                 datetime(2023, 12, 31, 23, 59, 59),
             ),
             (
-                "Income", "Work", "Salary", 100,
+                "Income",
+                "Work",
+                "Salary",
+                100,
                 datetime(2024, 1, 1),
             ),
             (
-                "Income", "Work", "Salary", 50,
+                "Income",
+                "Work",
+                "Salary",
+                50,
                 datetime(2024, 7, 15),
             ),
             (
-                "Expense", "Food", "Grocery", 25,
+                "Expense",
+                "Food",
+                "Grocery",
+                25,
                 datetime(2024, 12, 31, 23, 59, 59),
             ),
             (
-                "Expense", "Food", "Grocery", 8000,
+                "Expense",
+                "Food",
+                "Grocery",
+                8000,
                 datetime(2025, 1, 1),
             ),
         ]
@@ -93,25 +115,37 @@ class TestCategoryReporting(DatabaseTestCase):
 
         result = get_category_totals(2024)
 
-        self.assertEqual(result["income"], {
-            "labels": ["Salary"],
-            "amounts": [150],
-        })
-        self.assertEqual(result["expense"], {
-            "labels": ["Food"],
-            "amounts": [25],
-        })
+        self.assertEqual(
+            result["income"],
+            {
+                "labels": ["Salary"],
+                "amounts": [150],
+            },
+        )
+        self.assertEqual(
+            result["expense"],
+            {
+                "labels": ["Food"],
+                "amounts": [25],
+            },
+        )
 
         december = get_category_totals(2024, 12)
 
-        self.assertEqual(december["income"], {
-            "labels": [],
-            "amounts": [],
-        })
-        self.assertEqual(december["expense"], {
-            "labels": ["Food"],
-            "amounts": [25],
-        })
+        self.assertEqual(
+            december["income"],
+            {
+                "labels": [],
+                "amounts": [],
+            },
+        )
+        self.assertEqual(
+            december["expense"],
+            {
+                "labels": ["Food"],
+                "amounts": [25],
+            },
+        )
 
     def test_invalid_month_is_rejected(self):
         for month in [0, -1, 13]:

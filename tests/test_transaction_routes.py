@@ -9,7 +9,6 @@ from application.models import TransactionHistory
 from tests.base import DatabaseTestCase
 
 
-
 class CSRFTokenParser(HTMLParser):
     def __init__(self):
         super().__init__()
@@ -23,7 +22,6 @@ class CSRFTokenParser(HTMLParser):
 
 
 class TestTransactionRoutes(DatabaseTestCase):
-
     def get_csrf_token(self):
         response = self.client.get("/add")
         self.assertEqual(response.status_code, 200)
@@ -62,9 +60,7 @@ class TestTransactionRoutes(DatabaseTestCase):
     def test_valid_submission_saves_transaction_and_redirects(self):
         response = self.client.post(
             "/add",
-            data=self.transaction_data(
-                csrf_token=self.get_csrf_token()
-            ),
+            data=self.transaction_data(csrf_token=self.get_csrf_token()),
         )
 
         self.assertEqual(response.status_code, 302)
@@ -175,11 +171,9 @@ class TestTransactionRoutes(DatabaseTestCase):
                 self.assertEqual(response.status_code, 302)
                 self.assertEqual(TransactionHistory.query.count(), count)
 
-                entry = (
-                    TransactionHistory.query
-                    .order_by(TransactionHistory.id.desc())
-                    .first()
-                )
+                entry = TransactionHistory.query.order_by(
+                    TransactionHistory.id.desc()
+                ).first()
 
                 self.assertEqual(entry.amount_cents, expected_cents)
 
@@ -210,22 +204,24 @@ class TestTransactionRoutes(DatabaseTestCase):
     def test_dashboard_chart_values_are_in_euros(self):
         transaction_date = datetime.today()
 
-        db.session.add_all([
-            TransactionHistory(
-                type="Income",
-                first_category="Work",
-                second_category="Salary",
-                amount_cents=2000,
-                date=transaction_date,
-            ),
-            TransactionHistory(
-                type="Expense",
-                first_category="Food",
-                second_category="Grocery",
-                amount_cents=1250,
-                date=transaction_date,
-            ),
-        ])
+        db.session.add_all(
+            [
+                TransactionHistory(
+                    type="Income",
+                    first_category="Work",
+                    second_category="Salary",
+                    amount_cents=2000,
+                    date=transaction_date,
+                ),
+                TransactionHistory(
+                    type="Expense",
+                    first_category="Food",
+                    second_category="Grocery",
+                    amount_cents=1250,
+                    date=transaction_date,
+                ),
+            ]
+        )
         db.session.commit()
 
         response = self.client.get("/dashboard")

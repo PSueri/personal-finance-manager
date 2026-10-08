@@ -12,11 +12,13 @@ from application.models import TransactionHistory
 
 class TestAppInitialization(unittest.TestCase):
     def setUp(self):
-        self.app = create_app({
-            "TESTING": True,
-            "SECRET_KEY": "test-only-secret",
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-        })
+        self.app = create_app(
+            {
+                "TESTING": True,
+                "SECRET_KEY": "test-only-secret",
+                "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+            }
+        )
 
         self.context = self.app.app_context()
         self.context.push()
@@ -40,11 +42,13 @@ class TestAppInitialization(unittest.TestCase):
 
     def test_explicit_secret_key_overrides_missing_environment_value(self):
         with patch.dict(os.environ, {"SECRET_KEY": ""}):
-            app = create_app({
-                "TESTING": True,
-                "SECRET_KEY": "explicit-test-secret",
-                "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-            })
+            app = create_app(
+                {
+                    "TESTING": True,
+                    "SECRET_KEY": "explicit-test-secret",
+                    "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+                }
+            )
 
         self.assertEqual(
             app.config["SECRET_KEY"],

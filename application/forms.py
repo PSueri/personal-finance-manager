@@ -7,21 +7,24 @@ from application.categories import CATEGORY_TREE
 from application.money import parse_amount_to_cents
 from datetime import date, datetime
 
+
 class UserInputForm(FlaskForm):
     TYPES = [(name, name) for name in CATEGORY_TREE]
 
-    FIRST_CATEGORIES = list(dict.fromkeys(
-        category
-        for categories in CATEGORY_TREE.values()
-        for category in categories
-    ))
+    FIRST_CATEGORIES = list(
+        dict.fromkeys(
+            category for categories in CATEGORY_TREE.values() for category in categories
+        )
+    )
 
-    SECOND_CATEGORIES = list(dict.fromkeys(
-        subcategory
-        for categories in CATEGORY_TREE.values()
-        for subcategories in categories.values()
-        for subcategory in subcategories
-    ))
+    SECOND_CATEGORIES = list(
+        dict.fromkeys(
+            subcategory
+            for categories in CATEGORY_TREE.values()
+            for subcategories in categories.values()
+            for subcategory in subcategories
+        )
+    )
 
     type = SelectField(
         "Type",
@@ -32,17 +35,13 @@ class UserInputForm(FlaskForm):
     first_category = SelectField(
         "First Category",
         validators=[DataRequired(message="Select a category.")],
-        choices=[("", "Select...")] + [
-            (name, name) for name in FIRST_CATEGORIES
-        ],
+        choices=[("", "Select...")] + [(name, name) for name in FIRST_CATEGORIES],
     )
 
     second_category = SelectField(
         "Second Category",
         validators=[DataRequired(message="Select a subcategory.")],
-        choices=[("", "Select...")] + [
-            (name, name) for name in SECOND_CATEGORIES
-        ],
+        choices=[("", "Select...")] + [(name, name) for name in SECOND_CATEGORIES],
     )
 
     date = DateField(
@@ -88,11 +87,21 @@ class UserInputForm(FlaskForm):
         except ValueError as error:
             raise ValidationError(str(error)) from error
 
+
 class SelectYearMonthForm(FlaskForm):
     MONTHS = [
-        (1, "Jan"), (2, "Feb"), (3, "Mar"), (4, "Apr"),
-        (5, "May"), (6, "Jun"), (7, "Jul"), (8, "Aug"),
-        (9, "Sep"), (10, "Oct"), (11, "Nov"), (12, "Dec"),
+        (1, "Jan"),
+        (2, "Feb"),
+        (3, "Mar"),
+        (4, "Apr"),
+        (5, "May"),
+        (6, "Jun"),
+        (7, "Jul"),
+        (8, "Aug"),
+        (9, "Sep"),
+        (10, "Oct"),
+        (11, "Nov"),
+        (12, "Dec"),
     ]
 
     selected_year = SelectField(
@@ -127,4 +136,6 @@ class SelectYearMonthForm(FlaskForm):
 
         current_year = datetime.today().year
 
-        self.selected_year.choices = [(0, "Select...")] + [(year, str(year)) for year in range(current_year, current_year - 5, -1)]
+        self.selected_year.choices = [(0, "Select...")] + [
+            (year, str(year)) for year in range(current_year, current_year - 5, -1)
+        ]

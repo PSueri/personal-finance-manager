@@ -8,9 +8,7 @@ def get_last_twelve_month_labels(reference_date=None):
     if reference_date is None:
         reference_date = date.today()
 
-    current_month_index = (
-        reference_date.year * 12 + reference_date.month - 1
-    )
+    current_month_index = reference_date.year * 12 + reference_date.month - 1
 
     labels = []
 
@@ -23,6 +21,7 @@ def get_last_twelve_month_labels(reference_date=None):
 
     return labels
 
+
 def get_monthly_cashflow(reference_date=None):
     """Return cash flow aggregated by month for the reporting period."""
     if reference_date is None:
@@ -30,9 +29,7 @@ def get_monthly_cashflow(reference_date=None):
 
     labels = get_last_twelve_month_labels(reference_date)
 
-    current_month_index = (
-        reference_date.year * 12 + reference_date.month - 1
-    )
+    current_month_index = reference_date.year * 12 + reference_date.month - 1
 
     start_year, start_month = divmod(current_month_index - 11, 12)
     end_year, end_month = divmod(current_month_index + 1, 12)
@@ -40,17 +37,10 @@ def get_monthly_cashflow(reference_date=None):
     period_start = datetime(start_year, start_month + 1, 1)
     period_end = datetime(end_year, end_month + 1, 1)
 
-    monthly_totals = {
-        label: {"income": 0, "expense": 0}
-        for label in labels
-    }
+    monthly_totals = {label: {"income": 0, "expense": 0} for label in labels}
 
-    transaction_year = db.func.extract(
-        "year", TransactionHistory.date
-    )
-    transaction_month = db.func.extract(
-        "month", TransactionHistory.date
-    )
+    transaction_year = db.func.extract("year", TransactionHistory.date)
+    transaction_month = db.func.extract("month", TransactionHistory.date)
 
     statement = (
         db.select(
@@ -79,15 +69,9 @@ def get_monthly_cashflow(reference_date=None):
 
         monthly_totals[label][key] = amount_cents
 
-    income = [
-        monthly_totals[label]["income"]
-        for label in labels
-    ]
+    income = [monthly_totals[label]["income"] for label in labels]
 
-    expense = [
-        monthly_totals[label]["expense"]
-        for label in labels
-    ]
+    expense = [monthly_totals[label]["expense"] for label in labels]
 
     netflow = [
         income_amount - expense_amount
@@ -100,6 +84,7 @@ def get_monthly_cashflow(reference_date=None):
         "expense": expense,
         "netflow": netflow,
     }
+
 
 def _query_category_totals(transaction_type, period_start, period_end):
     if transaction_type == "Expense":

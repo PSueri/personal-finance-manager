@@ -8,7 +8,6 @@ from tests.base import DatabaseTestCase
 
 
 class TestTransactionPagination(DatabaseTestCase):
-
     def create_transactions(self, count):
         entries = [
             TransactionHistory(
@@ -89,18 +88,14 @@ class TestTransactionPagination(DatabaseTestCase):
 
         for page in [0, -1, 3]:
             with self.subTest(page=page):
-                response = self.client.get(
-                    f"/transactions?page={page}"
-                )
+                response = self.client.get(f"/transactions?page={page}")
 
                 self.assertEqual(response.status_code, 404)
 
     def test_page_size_cannot_be_increased_through_query_string(self):
         ids = self.create_transactions(25)
 
-        response = self.client.get(
-            "/transactions?per_page=1000"
-        )
+        response = self.client.get("/transactions?per_page=1000")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(

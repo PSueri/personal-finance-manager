@@ -19,9 +19,7 @@ def create_app(config=None):
         app.config.update(config)
 
     if not app.config["SECRET_KEY"]:
-        raise RuntimeError(
-            "The SECRET_KEY environment variable is not configured."
-        )
+        raise RuntimeError("The SECRET_KEY environment variable is not configured.")
 
     db.init_app(app)
     csrf.init_app(app)

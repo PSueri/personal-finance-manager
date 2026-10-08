@@ -6,12 +6,14 @@ from application.forms import UserInputForm
 
 class TestTransactionForm(unittest.TestCase):
     def setUp(self):
-        self.app = create_app({
-            "TESTING": True,
-            "SECRET_KEY": "test-only-secret",
-            "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
-            "WTF_CSRF_ENABLED": False,
-        })
+        self.app = create_app(
+            {
+                "TESTING": True,
+                "SECRET_KEY": "test-only-secret",
+                "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+                "WTF_CSRF_ENABLED": False,
+            }
+        )
 
     def validate_form(self, **changes):
         data = {
@@ -49,9 +51,7 @@ class TestTransactionForm(unittest.TestCase):
 
         for field_name in fields:
             with self.subTest(field=field_name):
-                form, is_valid = self.validate_form(
-                    **{field_name: ""}
-                )
+                form, is_valid = self.validate_form(**{field_name: ""})
 
                 self.assertFalse(is_valid)
                 self.assertIn(field_name, form.errors)

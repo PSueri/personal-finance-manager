@@ -132,6 +132,7 @@ Run the linter and tests from the project root:
 
 ```powershell
 .\venv\Scripts\python.exe -m ruff check .
+.\venv\Scripts\python.exe -m ruff format --check .
 .\venv\Scripts\python.exe -m unittest discover -s tests -t . -v
 ```
 
@@ -145,6 +146,7 @@ To apply available automatic lint fixes:
 
 ```powershell
 .\venv\Scripts\python.exe -m ruff check . --fix
+.\venv\Scripts\python.exe -m ruff format .
 ```
 
 Review the changes and rerun the checks afterwards. Ruff configuration is stored in `pyproject.toml`.
