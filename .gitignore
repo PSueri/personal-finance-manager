@@ -1,9 +1,13 @@
-**/venv
+# Virtual environments
+venv/
+.venv/
 
-**/.idea
+# IDE configuration
+.idea/
 
-**/instance
+# Local databases and instance configuration
+instance/
 
-**/application/__pycache__
-
-.idea/*
+# Python cache
+__pycache__/
+*.py[cod]
