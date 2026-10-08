@@ -1,20 +1,29 @@
-from flask import Blueprint, abort, render_template, flash, redirect, url_for, get_flashed_messages, request, current_app
-from sqlalchemy.exc import SQLAlchemyError
-from application.extensions import db
-from application.forms import UserInputForm, SelectYearMonthForm
-from application.models import TransactionHistory
-from application.money import parse_amount_to_cents
-import requests
 import calendar
 from datetime import datetime
 
+from flask import (
+    Blueprint,
+    abort,
+    current_app,
+    flash,
+    redirect,
+    render_template,
+    request,
+    url_for,
+)
+from sqlalchemy.exc import SQLAlchemyError
+
 from application.categories import CATEGORY_TREE
+from application.extensions import db
+from application.forms import SelectYearMonthForm, UserInputForm
+from application.models import TransactionHistory
+from application.money import parse_amount_to_cents
 from application.reporting import get_category_totals, get_monthly_cashflow
+
+main_bp = Blueprint("main", __name__)
 
 def chart_amounts(amounts_cents):
     return [amount / 100 for amount in amounts_cents]
-
-main_bp = Blueprint("main", __name__)
 
 @main_bp.route("/")
 def index():
