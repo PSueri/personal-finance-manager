@@ -1,4 +1,37 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
 {% block content %}
-        <h2> this is index file </h2>
+    <div class="col-12 col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="h3">Personal Finance Manager</h1>
+
+                <p>
+                    Record income and expenses, review your transactions
+                    and explore monthly and annual reports.
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a
+                        class="btn btn-outline-info"
+                        href="{{ url_for('main.dashboard') }}"
+                    >
+                        View Dashboard
+                    </a>
+                    <a
+                        class="btn btn-outline-info"
+                        href="{{ url_for('main.add_transaction') }}"
+                    >
+                        Add Transaction
+                    </a>
+                    <a
+                        class="btn btn-outline-info"
+                        href="{{ url_for('main.show_transactions') }}"
+                    >
+                        Transaction History
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
