@@ -1,53 +1,207 @@
-# Personal-Finance-Manager
-## A tool to manage your personal finance everywhere
+# Personal Finance Manager
 
-## Financial Dashboard
-In the dashboard page it's present a dashboard that displays income and expense data. 
+A Flask application for recording personal income and expenses and exploring financial reports.
 
-It has several graphs: 
-- The bar graph titled "Incomes vs Expenses" shows the income and expense amounts over months. 
-- The line graph titled "NetFlow" shows the net flow of income and expenses over the same time period.
+Transactions are stored in a local SQLite database. Monetary values are stored as integer cents and displayed in euros.
 
-![d1](images/dashboard_1.jpg)
+## Features
 
-The dashboard also displays income and expense data for a specific month. 
+- Record income and expense transactions with a date, category and subcategory.
+- Enter positive amounts using a decimal point or comma, such as `12.50` or `12,50`.
+- View transaction history, ordered by date and ID, with 20 transactions per page.
+- Delete transactions using POST requests protected by CSRF tokens.
+- Compare income, expenses and net cash flow over the last twelve calendar months, including the current month.
+- Explore monthly and annual category reports for a selected year and month.
+- Validate category relationships and show form errors.
+- Roll back failed database writes and log errors.
 
-The upper section titled "Expenses per Categories" shows two charts for expenses:
-- A pie chart that breaks down the total expenses into different categories (Cash, Taxes, Groceries, etc.) for the selected month.
-- A bar chart that shows the amount spent in each expense category for the selected month.
+Expense reports group transactions by primary category. Income reports group transactions by subcategory. The year/month filter changes the category reports; the twelve-month charts remain anchored to the current month.
 
-The lower section titled "Incomes per Categories" shows two charts for income:
-- A pie chart that breaks down the total income into different categories (Salary, Gifts, etc.) for the selected month.
-- A bar chart that shows the amount received in each income category for the selected month.
+## Requirements
 
-![d2](images/dashboard_2.jpg)
+- Python 3.12.
+- Git, if cloning the repository.
 
-The dashboard displays data for a user-selected month. By default, the current month is chosen, but users can switch to a different month using a selection tool.
+Runtime dependencies are pinned in `requirements.txt`. Development dependencies, including Ruff, are defined in `requirements-dev.txt`.
 
-![d3](images/dashboard_3.jpg)
+## Installation on Windows
 
-## Add Transaction Form
+Run the following commands in PowerShell. After cloning, run all subsequent commands from the project root.
 
-The form allows users to add new transactions to the financial dashboard. The data is stored in a SQLite database. Here are the fields users can fill out:
-- Amount: This field allows users to enter the transaction amount.
-- Type: This field allows users to specify whether the transaction is an expense or income.
-- Category: This section likely consists of two dropdown menus, allowing users to select a primary category and a secondary category for the transaction.
-- Date: This field allows users to enter the date of the transaction.
-- Add Transaction: Once users have filled out the form, they can click this button to submit the transaction and add it to the database.
+### 1. Clone the repository
 
-![a1](images/add_expense.jpg)
+```powershell
+git clone https://github.com/PSueri/personal-finance-manager.git
+cd personal-finance-manager
+```
 
-## Transaction History Table
+### 2. Create a virtual environment and install dependencies
 
-The Transaction page shows a table that displays the user's transaction history. 
+```powershell
+python -m venv venv
+.\venv\Scripts\python.exe -m pip install -r requirements.txt
+```
 
-The table is ordered by date, with the most recent transactions at the top. Each row in the table represents a single transaction and includes the following information:
-- ID: A unique identifier for the transaction.
-- Date: The date the transaction occurred.
-- Type: Whether the transaction is an income or expense.
-- First Category: A category for the transaction.
-- Second Category: A subcategory for the transaction.
-- Amount: The monetary value of the transaction.
-- Delete: A button that allows the user to delete the transaction from the table (and the underlying SQLite database).
+The commands below use the virtual environment's Python directly, so activation is not required.
 
-![d3](images/transactions.jpg)
+### 3. Configure the secret key
+
+Generate a key:
+
+```powershell
+.\venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Copy the generated value and set it in the same terminal:
+
+```powershell
+$env:SECRET_KEY = "PASTE_YOUR_GENERATED_KEY_HERE"
+```
+
+Flask uses this key to sign sessions and CSRF tokens. Keep it private and reuse the same value across application restarts. Do not commit it to the repository.
+
+This command sets the variable only for the current PowerShell session. Configure it again when opening a new terminal, or use the environment configuration of your IDE.
+
+### 4. Create the database
+
+```powershell
+.\venv\Scripts\python.exe -m flask --app application:create_app init-db
+```
+
+Expected output:
+
+```text
+Database tables created.
+```
+
+The application creates a new, empty database at `instance/Transazioni_cents.db`. Local database files are excluded from Git, so cloning the repository does not copy transaction history.
+
+`init-db` creates missing tables and preserves existing records when repeated. It does **not** update existing table schemas. Future schema changes require a migration strategy; Flask-Migrate is not currently configured.
+
+### 5. Start the application
+
+```powershell
+.\venv\Scripts\python.exe -m flask --app application:create_app run --port 8080
+```
+
+Open [http://127.0.0.1:8080](http://127.0.0.1:8080).
+
+For development, add `--debug` to the command to enable automatic reloads and debugging. These commands use Flask's development server.
+
+## Installation on Linux or macOS
+
+Clone the repository and enter the project directory, then run:
+
+```bash
+python3 -m venv venv
+venv/bin/python -m pip install -r requirements.txt
+venv/bin/python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Copy the generated key into the environment variable and continue in the same terminal:
+
+```bash
+export SECRET_KEY="PASTE_YOUR_GENERATED_KEY_HERE"
+venv/bin/python -m flask --app application:create_app init-db
+venv/bin/python -m flask --app application:create_app run --port 8080
+```
+
+The same database and secret-key behavior described above applies.
+
+## Running with PyCharm
+
+1. Select the project's virtual environment as the Python interpreter.
+2. Create a Python Run configuration for `run.py`.
+3. Set the working directory to the project root.
+4. Add `SECRET_KEY` with your generated value under **Environment variables**.
+5. Initialize the database using the terminal commands above, then run the configuration.
+
+The Run configuration, integrated Terminal and Python Console have separate environment settings. A key configured for Run is not automatically available in the Terminal or Python Console.
+
+Commands such as `python -m flask ...` belong in the Terminal. The Python Console accepts Python code, not shell commands.
+
+## Development checks
+
+Install development dependencies:
+
+```powershell
+.\venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+```
+
+Run the linter and tests from the project root:
+
+```powershell
+.\venv\Scripts\python.exe -m ruff check .
+.\venv\Scripts\python.exe -m unittest discover -s tests -t . -v
+```
+
+On Linux or macOS, replace `.\venv\Scripts\python.exe` with `venv/bin/python`.
+
+The tests create their own application configurations and use in-memory SQLite databases where database access is required. They do not require your personal `SECRET_KEY` or modify the local transaction database.
+
+The suite covers monetary conversion and display, form validation, reporting periods and totals, transaction routes, CSRF protection, pagination, database write failures, and application/database initialization.
+
+To apply available automatic lint fixes:
+
+```powershell
+.\venv\Scripts\python.exe -m ruff check . --fix
+```
+
+Review the changes and rerun the checks afterwards. Ruff configuration is stored in `pyproject.toml`.
+
+## Continuous integration
+
+The workflow in `.github/workflows/tests.yml` runs on pushes, pull requests and manual dispatches. It uses Python 3.12 on Ubuntu to:
+
+1. Install development dependencies.
+2. Check dependency compatibility with `pip check`.
+3. Run Ruff.
+4. Run the unittest suite.
+
+View results in the repository's **Actions** tab.
+
+## Project organization
+
+| File or directory | Responsibility |
+| --- | --- |
+| `run.py` | Create and run the application. |
+| `application/__init__.py` | Application factory, configuration, extension initialization, template filters and CLI commands. |
+| `application/extensions.py` | Shared SQLAlchemy and CSRF extension objects. |
+| `application/routes.py` | Blueprint routes, request handling and responses. |
+| `application/models.py` | Transaction database model. |
+| `application/forms.py` | Input conversion and validation. |
+| `application/categories.py` | Shared category and subcategory definitions. |
+| `application/money.py` | Conversion of input to cents and formatting for display. |
+| `application/reporting.py` | Reporting queries and financial aggregates. |
+| `application/templates/` | Jinja page templates. |
+| `application/static/js/` | Dashboard charts and dependent category menus. |
+| `tests/` | Unit and integration tests, with shared database setup in `base.py`. |
+| `instance/` | Local database files; excluded from version control. |
+
+## Screenshots
+
+### Financial dashboard
+
+The dashboard compares income and expenses and displays net cash flow over twelve months.
+
+![Income, expenses and net cash flow](images/dashboard_1.jpg)
+
+Category reports include pie and bar charts for expenses and income, with monthly and annual summaries.
+
+![Category reports](images/dashboard_2.jpg)
+
+Use the year/month controls to select the period for category reports.
+
+![Reporting period selection](images/dashboard_3.jpg)
+
+### Add a transaction
+
+Enter an amount, select Income or Expense, choose a category and subcategory, and provide the transaction date.
+
+![Add transaction form](images/add_expense.jpg)
+
+### Transaction history
+
+The history displays each transaction's ID, date, type, category, subcategory and amount, with a delete action and pagination.
+
+![Transaction history](images/transactions.jpg)
