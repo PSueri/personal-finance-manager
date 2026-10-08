@@ -24,7 +24,7 @@ def get_last_twelve_month_labels(reference_date=None):
     return labels
 
 def get_monthly_cashflow(reference_date=None):
-    """Return cash flow for twelve months ending with the reference month."""
+    """Return cash flow aggregated by month for the reporting period."""
     if reference_date is None:
         reference_date = date.today()
 
@@ -45,29 +45,39 @@ def get_monthly_cashflow(reference_date=None):
         for label in labels
     }
 
-    rows = (
-        db.session.query(
+    transaction_year = db.func.extract(
+        "year", TransactionHistory.date
+    )
+    transaction_month = db.func.extract(
+        "month", TransactionHistory.date
+    )
+
+    statement = (
+        db.select(
             TransactionHistory.type,
-            TransactionHistory.date,
+            transaction_year,
+            transaction_month,
             db.func.sum(TransactionHistory.amount_cents),
         )
-        .filter(
+        .where(
             TransactionHistory.type.in_(["Income", "Expense"]),
             TransactionHistory.date >= period_start,
             TransactionHistory.date < period_end,
         )
         .group_by(
             TransactionHistory.type,
-            TransactionHistory.date,
+            transaction_year,
+            transaction_month,
         )
-        .all()
     )
 
-    for transaction_type, transaction_date, amount in rows:
-        label = transaction_date.strftime("%Y %b")
+    rows = db.session.execute(statement).all()
+
+    for transaction_type, year, month, amount_cents in rows:
+        label = date(int(year), int(month), 1).strftime("%Y %b")
         key = "income" if transaction_type == "Income" else "expense"
 
-        monthly_totals[label][key] += amount
+        monthly_totals[label][key] = amount_cents
 
     income = [
         monthly_totals[label]["income"]
@@ -97,20 +107,21 @@ def _query_category_totals(transaction_type, period_start, period_end):
     else:
         category_column = TransactionHistory.second_category
 
-    rows = (
-        db.session.query(
+    statement = (
+        db.select(
             category_column,
             db.func.sum(TransactionHistory.amount_cents),
         )
-        .filter(
+        .where(
             TransactionHistory.type == transaction_type,
             TransactionHistory.date >= period_start,
             TransactionHistory.date < period_end,
         )
         .group_by(category_column)
         .order_by(category_column)
-        .all()
     )
+
+    rows = db.session.execute(statement).all()
 
     return {
         "labels": [category for category, _ in rows],
