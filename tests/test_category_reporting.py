@@ -21,7 +21,7 @@ class TestCategoryReporting(DatabaseTestCase):
             type=transaction_type,
             first_category=category,
             second_category=subcategory,
-            amount=amount,
+            amount_cents=amount,
             date=transaction_date,
         ))
 

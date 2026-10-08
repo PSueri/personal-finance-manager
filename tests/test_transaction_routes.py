@@ -48,7 +48,7 @@ class TestTransactionRoutes(DatabaseTestCase):
             first_category="Work",
             second_category="Salary",
             date=datetime(2024, 3, 15),
-            amount=100,
+            amount_cents=100,
         )
 
         db.session.add(entry)
@@ -72,7 +72,7 @@ class TestTransactionRoutes(DatabaseTestCase):
         self.assertEqual(entry.type, "Income")
         self.assertEqual(entry.first_category, "Work")
         self.assertEqual(entry.second_category, "Salary")
-        self.assertEqual(entry.amount, 100)
+        self.assertEqual(entry.amount_cents, 10000)
         self.assertEqual(entry.date, datetime(2024, 3, 15))
 
     def test_inconsistent_categories_do_not_save_transaction(self):

@@ -16,7 +16,7 @@ class TestMonthlyCashflow(DatabaseTestCase):
             type=transaction_type,
             first_category="Work" if is_income else "Food",
             second_category="Salary" if is_income else "Grocery",
-            amount=amount,
+            amount_cents=amount,
             date=transaction_date,
         )
 

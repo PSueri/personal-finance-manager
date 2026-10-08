@@ -49,7 +49,7 @@ def get_monthly_cashflow(reference_date=None):
         db.session.query(
             TransactionHistory.type,
             TransactionHistory.date,
-            db.func.sum(TransactionHistory.amount),
+            db.func.sum(TransactionHistory.amount_cents),
         )
         .filter(
             TransactionHistory.type.in_(["Income", "Expense"]),
@@ -100,7 +100,7 @@ def _query_category_totals(transaction_type, period_start, period_end):
     rows = (
         db.session.query(
             category_column,
-            db.func.sum(TransactionHistory.amount),
+            db.func.sum(TransactionHistory.amount_cents),
         )
         .filter(
             TransactionHistory.type == transaction_type,

@@ -22,7 +22,7 @@
                             <td>{{entry.type}}</td>
                             <td>{{ entry.first_category }}</td>
                             <td>{{ entry.second_category }}</td>
-                            <td>{{ entry.amount }}</td>
+                            <td>{{ entry.amount_cents | money }} €</td>
                             <td>
                                 <form
                                     action="{{ url_for('main.delete', entry_id=entry.id) }}"

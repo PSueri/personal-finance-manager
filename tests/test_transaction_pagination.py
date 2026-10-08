@@ -15,7 +15,7 @@ class TestTransactionPagination(DatabaseTestCase):
                 type="Income",
                 first_category="Work",
                 second_category="Salary",
-                amount=100,
+                amount_cents=100,
                 date=datetime(2024, 3, 15),
             )
             for _ in range(count)

@@ -1,8 +1,10 @@
 import os
 
+import click
 from flask import Flask
 
 from application.extensions import db, csrf
+from application.money import format_cents
 
 
 def create_app(config=None):
@@ -10,7 +12,7 @@ def create_app(config=None):
 
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY"),
-        SQLALCHEMY_DATABASE_URI="sqlite:///Transazioni.db",
+        SQLALCHEMY_DATABASE_URI="sqlite:///Transazioni_cents.db",
     )
 
     if config is not None:
@@ -24,8 +26,16 @@ def create_app(config=None):
     db.init_app(app)
     csrf.init_app(app)
 
+    app.jinja_env.filters["money"] = format_cents
+
     from application.routes import main_bp
 
     app.register_blueprint(main_bp)
+
+    @app.cli.command("init-db")
+    def init_db():
+        """Create missing database tables."""
+        db.create_all()
+        click.echo("Database tables created.")
 
     return app

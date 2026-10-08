@@ -29,7 +29,7 @@ class TestTransactionWriteErrors(DatabaseTestCase):
             first_category="Work",
             second_category="Salary",
             date=datetime(2024, 3, 15),
-            amount=100,
+            amount_cents=100,
         )
 
         db.session.add(entry)

@@ -7,7 +7,7 @@ class TransactionHistory(db.Model):
     first_category=db.Column(db.String(30), default='Select', nullable=False)
     second_category=db.Column(db.String(30), default='Select', nullable=False)
     date=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    amount=db.Column(db.Integer, nullable=False)
+    amount_cents = db.Column(db.Integer, nullable=False)
 
     def __str__(self):
-        return self.id
+        return str(self.id)

@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired, InputRequired, NumberRange, Validat
 from wtforms.fields import DateField
 
 from application.categories import CATEGORY_TREE
+from application.money import parse_amount_to_cents
 from datetime import date, datetime
 
 class UserInputForm(FlaskForm):
@@ -51,15 +52,9 @@ class UserInputForm(FlaskForm):
         default=date.today,
     )
 
-    amount = IntegerField(
-        "Amount",
-        validators=[
-            InputRequired(message="Enter an amount."),
-            NumberRange(
-                min=1,
-                message="The amount must be greater than zero.",
-            ),
-        ],
+    amount = StringField(
+        "Amount (€)",
+        validators=[InputRequired(message="Enter an amount.")],
     )
 
     submit = SubmitField("Add Transaction")
@@ -86,6 +81,12 @@ class UserInputForm(FlaskForm):
             raise ValidationError(
                 "The subcategory does not belong to the selected category."
             )
+
+    def validate_amount(self, field):
+        try:
+            parse_amount_to_cents(field.data)
+        except ValueError as error:
+            raise ValidationError(str(error)) from error
 
 class SelectYearMonthForm(FlaskForm):
     MONTHS = [

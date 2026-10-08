@@ -3,6 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from application.extensions import db
 from application.forms import UserInputForm, SelectYearMonthForm
 from application.models import TransactionHistory
+from application.money import parse_amount_to_cents
 import requests
 import calendar
 from datetime import datetime
@@ -10,6 +11,8 @@ from datetime import datetime
 from application.categories import CATEGORY_TREE
 from application.reporting import get_category_totals, get_monthly_cashflow
 
+def chart_amounts(amounts_cents):
+    return [amount / 100 for amount in amounts_cents]
 
 main_bp = Blueprint("main", __name__)
 
@@ -27,7 +30,7 @@ def add_transaction():
             type=form.type.data,
             first_category=form.first_category.data,
             second_category=form.second_category.data,
-            amount=form.amount.data,
+            amount_cents=parse_amount_to_cents(form.amount.data),
             date=form.date.data,
         )
 
@@ -104,17 +107,17 @@ def dashboard():
     return render_template(
         "dashboard.html",
         title="Dashboard",
-        income_month=cashflow["income"],
-        expense_month=cashflow["expense"],
-        netflow_month=cashflow["netflow"],
+        income_month=chart_amounts(cashflow["income"]),
+        expense_month=chart_amounts(cashflow["expense"]),
+        netflow_month=chart_amounts(cashflow["netflow"]),
         dates_label=cashflow["labels"],
-        cat_exp_amount=monthly_categories["expense"]["amounts"],
+        cat_exp_amount=chart_amounts(monthly_categories["expense"]["amounts"]),
         cat_exp_label=monthly_categories["expense"]["labels"],
-        cat_exp_amount_year=yearly_categories["expense"]["amounts"],
+        cat_exp_amount_year=chart_amounts(yearly_categories["expense"]["amounts"]),
         cat_exp_label_year=yearly_categories["expense"]["labels"],
-        cat_inc_amount=monthly_categories["income"]["amounts"],
+        cat_inc_amount=chart_amounts(monthly_categories["income"]["amounts"]),
         cat_inc_label=monthly_categories["income"]["labels"],
-        cat_inc_amount_year=yearly_categories["income"]["amounts"],
+        cat_inc_amount_year=chart_amounts(yearly_categories["income"]["amounts"]),
         cat_inc_label_year=yearly_categories["income"]["labels"],
         selectionform=selectionform,
         current_period=current_period,
