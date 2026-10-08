@@ -1,5 +1,7 @@
 import re
 
+MAX_AMOUNT_CENTS = 9_223_372_036_854_775_807
+
 def parse_amount_to_cents(amount_text):
     """Convert a positive amount with up to two decimal places to cents."""
     normalized = amount_text.strip()
@@ -19,6 +21,8 @@ def parse_amount_to_cents(amount_text):
 
     if cents <= 0:
         raise ValueError("The amount must be greater than zero.")
+    if cents > MAX_AMOUNT_CENTS:
+        raise ValueError("The amount exceeds the supported maximum.")
 
     return cents
 

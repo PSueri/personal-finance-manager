@@ -1,6 +1,6 @@
 import unittest
 
-from application.money import format_cents, parse_amount_to_cents
+from application.money import MAX_AMOUNT_CENTS, format_cents, parse_amount_to_cents
 
 
 class TestAmountConversion(unittest.TestCase):
@@ -42,6 +42,24 @@ class TestAmountConversion(unittest.TestCase):
             with self.subTest(amount=text):
                 with self.assertRaises(ValueError):
                     parse_amount_to_cents(text)
+
+    def test_maximum_supported_amount_is_accepted(self):
+        self.assertEqual(
+            parse_amount_to_cents("92233720368547758.07"),
+            MAX_AMOUNT_CENTS,
+        )
+
+    def test_amounts_above_the_supported_maximum_are_rejected(self):
+        for amount in [
+            "92233720368547758.08",
+            "99999999999999999999",
+        ]:
+            with self.subTest(amount=amount):
+                with self.assertRaisesRegex(
+                    ValueError,
+                    "exceeds the supported maximum",
+                ):
+                    parse_amount_to_cents(amount)
 
 class TestAmountFormatting(unittest.TestCase):
     def test_non_negative_amounts_are_formatted_with_two_decimal_places(self):

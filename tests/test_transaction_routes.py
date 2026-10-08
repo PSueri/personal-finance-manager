@@ -250,6 +250,22 @@ class TestTransactionRoutes(DatabaseTestCase):
         self.assertEqual(data["category_incomes_year_values"], [20])
         self.assertEqual(data["category_expenses_year_values"], [12.5])
 
+    def test_amount_above_storage_limit_is_not_saved(self):
+        response = self.client.post(
+            "/add",
+            data=self.transaction_data(
+                amount="92233720368547758.08",
+                csrf_token=self.get_csrf_token(),
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(TransactionHistory.query.count(), 0)
+        self.assertIn(
+            "The amount exceeds the supported maximum.",
+            response.get_data(as_text=True),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
