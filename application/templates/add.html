@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <div class="col-xs-10 col-sm-6 col-md-6 ml-auto mr-auto">
+    <div class="col-12 col-md-6">
         <div class="card card-style mb-2">
             <div class="card-body">
                 <form action="" method="POST">
@@ -35,18 +35,18 @@
                         </div>
 
                         <div class="form-group">
-                            {{ form.type.label(class = "form-control-label") }}
-                            {{ form.type(class = "form-control form-control-sm", id="transactionType") }}
+                            {{ form.type.label(class = "form-label") }}
+                            {{ form.type(class="form-select form-select-sm", id="transactionType") }}
                         </div>
 
                         <div class="form-group">
-                            {{ form.first_category.label(class = "form-control-label") }}
-                            {{ form.first_category(class = "form-control form-control-sm", id="firstCategory") }}
+                            {{ form.first_category.label(class = "form-label") }}
+                            {{ form.first_category(class="form-select form-select-sm", id="firstCategory") }}
                         </div>
 
                         <div class="form-group">
-                            {{ form.second_category.label(class = "form-control-label") }}
-                            {{ form.second_category(class = "form-control form-control-sm", id="secondCategory") }}
+                            {{ form.second_category.label(class = "form-label") }}
+                            {{ form.second_category(class="form-select form-select-sm", id="secondCategory") }}
                         </div>
                         <div class="form-group">
                             {{ form.date.label(class = "form-control-label") }}
