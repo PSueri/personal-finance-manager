@@ -16,9 +16,7 @@ def main():
     )
 
     with app.app_context():
-        existing_id = db.session.scalar(
-            db.select(TransactionHistory.id).limit(1)
-        )
+        existing_id = db.session.scalar(db.select(TransactionHistory.id).limit(1))
 
         if existing_id is not None:
             print("The demo database already contains transactions. No data added.")
@@ -46,9 +44,7 @@ def main():
 
             # Include one month with negative net cash flow.
             if index == 8:
-                monthly_transactions.append(
-                    ("Expense", "Holiday", "Generic", 250_000)
-                )
+                monthly_transactions.append(("Expense", "Holiday", "Generic", 250_000))
 
             for position, transaction in enumerate(
                 monthly_transactions,
