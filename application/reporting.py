@@ -3,6 +3,13 @@ from application.extensions import db
 from application.models import TransactionHistory
 
 
+def _sum_amounts():
+    if db.engine.dialect.name == "sqlite":
+        return db.func.sum_cents(TransactionHistory.amount_cents)
+
+    return db.func.sum(TransactionHistory.amount_cents)
+
+
 def get_last_twelve_month_labels(reference_date=None):
     """Return 12-month labels ending with the reference month."""
     if reference_date is None:
@@ -47,7 +54,7 @@ def get_monthly_cashflow(reference_date=None):
             TransactionHistory.type,
             transaction_year,
             transaction_month,
-            db.func.sum(TransactionHistory.amount_cents),
+            _sum_amounts(),
         )
         .where(
             TransactionHistory.type.in_(["Income", "Expense"]),
@@ -67,7 +74,7 @@ def get_monthly_cashflow(reference_date=None):
         label = date(int(year), int(month), 1).strftime("%Y %b")
         key = "income" if transaction_type == "Income" else "expense"
 
-        monthly_totals[label][key] = amount_cents
+        monthly_totals[label][key] = int(amount_cents)
 
     income = [monthly_totals[label]["income"] for label in labels]
 
@@ -95,7 +102,7 @@ def _query_category_totals(transaction_type, period_start, period_end):
     statement = (
         db.select(
             category_column,
-            db.func.sum(TransactionHistory.amount_cents),
+            _sum_amounts(),
         )
         .where(
             TransactionHistory.type == transaction_type,
@@ -110,7 +117,7 @@ def _query_category_totals(transaction_type, period_start, period_end):
 
     return {
         "labels": [category for category, _ in rows],
-        "amounts": [amount for _, amount in rows],
+        "amounts": [int(amount) for _, amount in rows],
     }
 
 

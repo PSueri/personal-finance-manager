@@ -4,6 +4,7 @@ from flask import Flask
 
 from application.extensions import csrf, db, migrate
 from application.money import format_cents
+from application.database import init_database_functions
 
 
 def create_app(config=None):
@@ -24,6 +25,7 @@ def create_app(config=None):
         raise RuntimeError("The SECRET_KEY environment variable is not configured.")
 
     db.init_app(app)
+    init_database_functions(app)
     csrf.init_app(app)
     migrate.init_app(app, db)
 
