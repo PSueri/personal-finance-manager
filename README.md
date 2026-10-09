@@ -62,19 +62,25 @@ Flask uses this key to sign sessions and CSRF tokens. Keep it private and reuse 
 
 This command sets the variable only for the current PowerShell session. Configure it again when opening a new terminal, or use the environment configuration of your IDE.
 
-### 4. Create the database
+### 4. Create or update the database
 
 ```powershell
 .\venv\Scripts\python.exe -m flask --app application:create_app db upgrade
 ```
 
-Expected output:
+This command applies the committed migrations, creating the database and its
+tables on the first run. If the database is already up to date, no schema
+changes are applied.
+
+On the first run, the output includes a message similar to:
 
 ```text
-Database tables created.
+INFO [alembic.runtime.migration] Running upgrade -> 47a4346290ab, Create initial transaction schema
 ```
-Create or update the database by applying the committed migrations.
-Running this command again leaves an already up-to-date database unchanged.
+
+The SQLite database is stored in `instance/Transazioni_cents.db` by default.
+
+Run this command again after pulling changes that include new migrations.
 
 ### 5. Start the application
 
