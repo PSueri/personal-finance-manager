@@ -65,7 +65,7 @@ This command sets the variable only for the current PowerShell session. Configur
 ### 4. Create the database
 
 ```powershell
-.\venv\Scripts\python.exe -m flask --app application:create_app init-db
+.\venv\Scripts\python.exe -m flask --app application:create_app db upgrade
 ```
 
 Expected output:
@@ -73,10 +73,8 @@ Expected output:
 ```text
 Database tables created.
 ```
-
-The application creates a new, empty database at `instance/Transazioni_cents.db`. Local database files are excluded from Git, so cloning the repository does not copy transaction history.
-
-`init-db` creates missing tables and preserves existing records when repeated. It does **not** update existing table schemas. Future schema changes require a migration strategy; Flask-Migrate is not currently configured.
+Create or update the database by applying the committed migrations.
+Running this command again leaves an already up-to-date database unchanged.
 
 ### 5. Start the application
 
@@ -102,7 +100,7 @@ Copy the generated key into the environment variable and continue in the same te
 
 ```bash
 export SECRET_KEY="PASTE_YOUR_GENERATED_KEY_HERE"
-venv/bin/python -m flask --app application:create_app init-db
+venv/bin/python -m flask --app application:create_app db upgrade
 venv/bin/python -m flask --app application:create_app run --port 8080
 ```
 

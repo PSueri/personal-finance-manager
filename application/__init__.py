@@ -1,6 +1,5 @@
 import os
 
-import click
 from flask import Flask
 
 from application.extensions import csrf, db, migrate
@@ -33,11 +32,5 @@ def create_app(config=None):
     from application.routes import main_bp
 
     app.register_blueprint(main_bp)
-
-    @app.cli.command("init-db")
-    def init_db():
-        """Create missing database tables."""
-        db.create_all()
-        click.echo("Database tables created.")
 
     return app
