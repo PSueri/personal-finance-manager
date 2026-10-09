@@ -1,13 +1,37 @@
-from application.extensions import db
 from datetime import datetime
+
+from application.extensions import db
 
 
 class TransactionHistory(db.Model):
+    __table_args__ = (
+        db.CheckConstraint(
+            "amount_cents > 0",
+            name="ck_transaction_amount_positive",
+        ),
+        db.CheckConstraint(
+            "type IN ('Income', 'Expense')",
+            name="ck_transaction_type_valid",
+        ),
+    )
+
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(30), default="Select", nullable=False)
-    first_category = db.Column(db.String(30), default="Select", nullable=False)
-    second_category = db.Column(db.String(30), default="Select", nullable=False)
-    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    type = db.Column(db.String(30), nullable=False)
+    first_category = db.Column(
+        db.String(30),
+        default="Select",
+        nullable=False,
+    )
+    second_category = db.Column(
+        db.String(30),
+        default="Select",
+        nullable=False,
+    )
+    date = db.Column(
+        db.DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
     amount_cents = db.Column(db.Integer, nullable=False)
 
     def __str__(self):

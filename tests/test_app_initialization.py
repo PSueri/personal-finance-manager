@@ -129,6 +129,21 @@ class TestAppInitialization(unittest.TestCase):
         self.assertEqual(saved_entry.date, datetime(2024, 3, 15))
         self.assertEqual(saved_entry.amount_cents, 1250)
 
+    def test_migrations_create_transaction_constraints(self):
+        self.run_db_command("upgrade")
+
+        constraints = inspect(db.engine).get_check_constraints(
+            TransactionHistory.__tablename__
+        )
+        constraint_names = {constraint["name"] for constraint in constraints}
+
+        self.assertTrue(
+            {
+                "ck_transaction_amount_positive",
+                "ck_transaction_type_valid",
+            }.issubset(constraint_names)
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
