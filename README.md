@@ -249,24 +249,24 @@ View results in the repository's **Actions** tab.
 
 ## Project organization
 
-| File or directory | Responsibility |
-| --- | --- |
-| `run.py` | Create and run the application. |
-| `application/__init__.py` | Application factory, configuration, extension initialization and template filters. |
-| `application/extensions.py` | Shared SQLAlchemy, CSRF and Flask-Migrate extension objects. |
-| `application/database.py` | SQLite connection configuration and exact monetary aggregation. |
-| `application/routes.py` | Blueprint routes, request handling and responses. |
-| `application/models.py` | Transaction database model. |
-| `application/forms.py` | Input conversion and validation. |
-| `application/categories.py` | Shared category and subcategory definitions. |
-| `application/money.py` | Conversion of input to cents and formatting for display. |
-| `application/reporting.py` | Reporting queries and financial aggregates. |
-| `application/templates/` | Jinja page templates. |
-| `application/static/js/` | Dashboard charts and dependent category menus. |
-| `tests/` | Unit and integration tests, with shared database setup in `base.py`. |
-| `browser_tests/` | Browser tests using Playwright and isolated temporary databases. |
-| `instance/` | Local database files; excluded from version control. |
-| `migrations/` | Versioned database schema migrations. |
+| File or directory           | Responsibility                                                                     |
+|-----------------------------|------------------------------------------------------------------------------------|
+| `run.py`                    | Create and run the application.                                                    |
+| `application/__init__.py`   | Application factory, configuration, extension initialization and template filters. |
+| `application/extensions.py` | Shared SQLAlchemy, CSRF and Flask-Migrate extension objects.                       |
+| `application/database.py`   | SQLite connection configuration and exact monetary aggregation.                    |
+| `application/routes.py`     | Blueprint routes, request handling and responses.                                  |
+| `application/models.py`     | Transaction database model.                                                        |
+| `application/forms.py`      | Input conversion and validation.                                                   |
+| `application/categories.py` | Shared category and subcategory definitions.                                       |
+| `application/money.py`      | Conversion of input to cents and formatting for display.                           |
+| `application/reporting.py`  | Reporting queries and financial aggregates.                                        |
+| `application/templates/`    | Jinja page templates.                                                              |
+| `application/static/js/`    | Dashboard charts and dependent category menus.                                     |
+| `tests/`                    | Unit and integration tests, with shared database setup in `base.py`.               |
+| `browser_tests/`            | Browser tests using Playwright and isolated temporary databases.                   |
+| `instance/`                 | Local database files; excluded from version control.                               |
+| `migrations/`               | Versioned database schema migrations.                                              |
 
 ## Screenshots
 
@@ -279,6 +279,7 @@ The dashboard compares income and expenses and displays net cash flow over twelv
 Category reports include pie and bar charts for expenses and income, with monthly and annual summaries.
 
 ![Category reports](images/dashboard_2.jpg)
+![Category reports](images/dashboard_2_1.jpg)
 
 Use the year/month controls to select the period for category reports.
 
