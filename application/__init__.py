@@ -3,7 +3,7 @@ import os
 import click
 from flask import Flask
 
-from application.extensions import db, csrf
+from application.extensions import csrf, db, migrate
 from application.money import format_cents
 
 
@@ -23,6 +23,7 @@ def create_app(config=None):
 
     db.init_app(app)
     csrf.init_app(app)
+    migrate.init_app(app, db)
 
     app.jinja_env.filters["money"] = format_cents
 
