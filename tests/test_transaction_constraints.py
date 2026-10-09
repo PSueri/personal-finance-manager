@@ -20,13 +20,23 @@ class TestTransactionConstraints(DatabaseTestCase):
 
         return TransactionHistory(**values)
 
-    def test_database_rejects_invalid_amounts_and_types(self):
+    def test_database_rejects_invalid_transaction_values(self):
         invalid_values = [
             {"amount_cents": 0},
             {"amount_cents": -100},
             {"type": ""},
             {"type": "Select"},
             {"type": "Transfer"},
+            {"first_category": None},
+            {"first_category": ""},
+            {"first_category": "   "},
+            {"first_category": "Select"},
+            {"first_category": " Select "},
+            {"second_category": None},
+            {"second_category": ""},
+            {"second_category": "   "},
+            {"second_category": "Select"},
+            {"second_category": " Select "},
         ]
 
         for changes in invalid_values:

@@ -141,6 +141,8 @@ class TestAppInitialization(unittest.TestCase):
             {
                 "ck_transaction_amount_positive",
                 "ck_transaction_type_valid",
+                "ck_transaction_first_category_required",
+                "ck_transaction_second_category_required",
             }.issubset(constraint_names)
         )
 

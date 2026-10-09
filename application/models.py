@@ -13,20 +13,20 @@ class TransactionHistory(db.Model):
             "type IN ('Income', 'Expense')",
             name="ck_transaction_type_valid",
         ),
+        db.CheckConstraint(
+            "length(trim(first_category)) > 0 AND trim(first_category) <> 'Select'",
+            name="ck_transaction_first_category_required",
+        ),
+        db.CheckConstraint(
+            "length(trim(second_category)) > 0 AND trim(second_category) <> 'Select'",
+            name="ck_transaction_second_category_required",
+        ),
     )
 
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(30), nullable=False)
-    first_category = db.Column(
-        db.String(30),
-        default="Select",
-        nullable=False,
-    )
-    second_category = db.Column(
-        db.String(30),
-        default="Select",
-        nullable=False,
-    )
+    first_category = db.Column(db.String(30), nullable=False)
+    second_category = db.Column(db.String(30), nullable=False)
     date = db.Column(
         db.DateTime,
         nullable=False,
