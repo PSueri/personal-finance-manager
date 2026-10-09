@@ -12,7 +12,10 @@ def create_app(config=None):
 
     app.config.from_mapping(
         SECRET_KEY=os.environ.get("SECRET_KEY"),
-        SQLALCHEMY_DATABASE_URI="sqlite:///Transazioni_cents.db",
+        SQLALCHEMY_DATABASE_URI=os.environ.get(
+            "DATABASE_URL",
+            "sqlite:///Transazioni_cents.db",
+        ),
     )
 
     if config is not None:
